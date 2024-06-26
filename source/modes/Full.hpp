@@ -54,7 +54,7 @@ public:
 	}
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", APP_VERSION);
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", APP_VERSION"-ASAP");
 
 		auto Status = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, u16 x, u16 y, u16 w, u16 h) {
 			
@@ -66,15 +66,15 @@ public:
 				if (realCPU_Hz && settings.showRealFreqs) {
 					height_offset = 162;
 				}
-				renderer->drawString("CPU Usage:", false, COMMON_MARGIN, 120, 20, renderer->a(0xFFFF));
-				auto dimensions = renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
+				renderer->drawString("· CPU", false, COMMON_MARGIN, 120, 20, renderer->a(0xFFFF));
+				auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 				uint32_t offset = COMMON_MARGIN + dimensions.first;
 				if (settings.showTargetFreqs) {
-					renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+					renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
 					renderer->drawString(CPU_Hz_c, false, offset, height_offset, 15, renderer->a(0xFFFF));
 				}
 				if (realCPU_Hz && settings.showRealFreqs) {
-					renderer->drawString("Real Frequency:", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+					renderer->drawString("실제 주파수 :", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
 					renderer->drawString(RealCPU_Hz_c, false, offset, height_offset - 15, 15, renderer->a(0xFFFF));
 					if (settings.showDeltas && settings.showTargetFreqs) {
 						renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
@@ -97,17 +97,17 @@ public:
 					height_offset = 327;
 				}
 
-				renderer->drawString("GPU Usage:", false, COMMON_MARGIN, 285, 20, renderer->a(0xFFFF));
+				renderer->drawString("· GPU", false, COMMON_MARGIN, 285, 20, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
-					auto dimensions = renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
+					auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 					uint32_t offset = COMMON_MARGIN + dimensions.first;
 					if (settings.showTargetFreqs) { 
-						renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
 						renderer->drawString(GPU_Hz_c, false, offset, height_offset, 15, renderer->a(0xFFFF));
 
 					}
 					if (realCPU_Hz && settings.showRealFreqs) {
-						renderer->drawString("Real Frequency: ", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+						renderer->drawString("실제 주파수 : ", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
 						renderer->drawString(RealGPU_Hz_c, false, offset, height_offset - 15, 15, renderer->a(0xFFFF));
 						if (settings.showDeltas && settings.showTargetFreqs) {
 							renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
@@ -134,16 +134,16 @@ public:
 					height_offset += 7;
 				}
 
-				renderer->drawString("RAM Usage:", false, COMMON_MARGIN, 375, 20, renderer->a(0xFFFF));
+				renderer->drawString("· RAM", false, COMMON_MARGIN, 375, 20, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
-					auto dimensions = renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
+					auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 					uint32_t offset = COMMON_MARGIN + dimensions.first;
 					if (settings.showTargetFreqs) {
-						renderer->drawString("Target Frequency: ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
 						renderer->drawString(RAM_Hz_c, false, offset, height_offset, 15, renderer->a(0xFFFF));
 					}
 					if (realRAM_Hz && settings.showRealFreqs) {
-						renderer->drawString("Real Frequency:", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+						renderer->drawString("실제 주파수 :", false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
 						renderer->drawString(RealRAM_Hz_c, false, offset, height_offset - 15, 15, renderer->a(0xFFFF));
 						if (settings.showDeltas && settings.showTargetFreqs) {
 							renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
@@ -160,21 +160,21 @@ public:
 					}
 				}
 				if (R_SUCCEEDED(Hinted)) {
-					auto dimensions = renderer->drawString("Total: \nApplication: \nApplet: \nSystem: \nSystem Unsafe: ", false, 0, height_offset + 40, 15, renderer->a(0x0000));
-					renderer->drawString("Total: \nApplication: \nApplet: \nSystem: \nSystem Unsafe: ", false, COMMON_MARGIN, height_offset + 40, 15, renderer->a(0xFFFF));
+					auto dimensions = renderer->drawString("종합 : \n타이틀 : \n애플릿 : \n시스템 : \nUnsafe : ", false, 0, height_offset + 40, 15, renderer->a(0x0000));
+					renderer->drawString("종합 : \n타이틀 : \n애플릿 : \n시스템 : \nUnsafe : ", false, COMMON_MARGIN, height_offset + 40, 15, renderer->a(0xFFFF));
 					renderer->drawString(RAM_var_compressed_c, false, COMMON_MARGIN + dimensions.first, height_offset + 40, 15, renderer->a(0xFFFF));
 				}
 			}
 			
 			///Thermal
 			if (R_SUCCEEDED(tsCheck) || R_SUCCEEDED(tcCheck) || R_SUCCEEDED(fanCheck)) {
-				renderer->drawString("Board:", false, 20, 550, 20, renderer->a(0xFFFF));
+				renderer->drawString("· 메인보드", false, 20, 550, 20, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(tsCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 575, 15, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(tsCheck)) {
-					auto dimensions1 = renderer->drawString("Temperatures: ", false, 0, 590, 15, renderer->a(0x0000));
-					auto dimensions2 = renderer->drawString("SoC \nPCB \nSkin ", false, 0, 590, 15, renderer->a(0x0000));
-					renderer->drawString("Temperatures:", false, COMMON_MARGIN, 590, 15, renderer->a(0xFFFF));
-					renderer->drawString("SoC\nPCB\nSkin", false, COMMON_MARGIN + dimensions1.first, 590, 15, renderer->a(0xFFFF));
+					auto dimensions1 = renderer->drawString("온도 : ", false, 0, 590, 15, renderer->a(0x0000));
+					auto dimensions2 = renderer->drawString("소켓 \n기판 \n표면 ", false, 0, 590, 15, renderer->a(0x0000));
+					renderer->drawString("온도 :", false, COMMON_MARGIN, 590, 15, renderer->a(0xFFFF));
+					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 590, 15, renderer->a(0xFFFF));
 					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 590, 15, renderer->a(0xFFFF));
 				}
 				if (R_SUCCEEDED(fanCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 635, 15, renderer->a(0xFFFF));
@@ -183,7 +183,7 @@ public:
 			///FPS
 			if (GameRunning) {
 				uint32_t width_offset = 230;
-				auto dimensions = renderer->drawString("PFPS: \nFPS:", false, COMMON_MARGIN + width_offset, 120, 20, renderer->a(0xFFFF));
+				auto dimensions = renderer->drawString("PFPS : \nFPS   :", false, COMMON_MARGIN + width_offset, 120, 20, renderer->a(0xFFFF));
 				uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
 				renderer->drawString(FPS_var_compressed_c, false, offset, 120, 20, renderer->a(0xFFFF));
 			}
@@ -191,7 +191,7 @@ public:
 			std::string formattedKeyCombo = keyCombo;
 			formatButtonCombination(formattedKeyCombo);
 			
-			std::string message = "Hold " + formattedKeyCombo + " to Exit";
+			std::string message = "홈 메뉴 : " + formattedKeyCombo + " 홀드";
 			
 			renderer->drawString(message.c_str(), false, COMMON_MARGIN, 693, 23, renderer->a(0xFFFF));
 			
@@ -206,17 +206,17 @@ public:
 		//Make stuff ready to print
 		///CPU
 		if (idletick0 > systemtickfrequency_impl)
-			strcpy(CPU_Usage0, "Core #0: 0.00%");
-		else snprintf(CPU_Usage0, sizeof CPU_Usage0, "Core #0: %.2f%%", (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100);
+			strcpy(CPU_Usage0, "0번 코어 : 0.00%");
+		else snprintf(CPU_Usage0, sizeof CPU_Usage0, "0번 코어 : %.2f%%", (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100);
 		if (idletick1 > systemtickfrequency_impl)
-			strcpy(CPU_Usage1, "Core #1: 0.00%");
-		else snprintf(CPU_Usage1, sizeof CPU_Usage1, "Core #1: %.2f%%", (1.d - ((double)idletick1 / systemtickfrequency_impl)) * 100);
+			strcpy(CPU_Usage1, "1번 코어 : 0.00%");
+		else snprintf(CPU_Usage1, sizeof CPU_Usage1, "1번 코어 : %.2f%%", (1.d - ((double)idletick1 / systemtickfrequency_impl)) * 100);
 		if (idletick2 > systemtickfrequency_impl)
-			strcpy(CPU_Usage2, "Core #2: 0.00%");
-		else snprintf(CPU_Usage2, sizeof CPU_Usage2, "Core #2: %.2f%%", (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100);
+			strcpy(CPU_Usage2, "2번 코어 : 0.00%");
+		else snprintf(CPU_Usage2, sizeof CPU_Usage2, "2번 코어 : %.2f%%", (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100);
 		if (idletick3 > systemtickfrequency_impl)
-			strcpy(CPU_Usage3, "Core #3: 0.00%");
-		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "Core #3: %.2f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);
+			strcpy(CPU_Usage3, "3번 코어 : 0.00%");
+		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "3번 코어 : %.2f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);
 
 		snprintf(CPU_compressed_c, sizeof CPU_compressed_c, "%s\n%s\n%s\n%s", CPU_Usage0, CPU_Usage1, CPU_Usage2, CPU_Usage3);
 
@@ -235,7 +235,7 @@ public:
 			int32_t deltaGPU = (int32_t)(realGPU_Hz / 1000) - (GPU_Hz / 1000);
 			snprintf(DeltaGPU_c, sizeof(DeltaGPU_c), "Δ %d.%u", deltaGPU / 1000, abs(deltaGPU / 100) % 10);
 		}
-		snprintf(GPU_Load_c, sizeof GPU_Load_c, "Load: %u.%u%%", GPU_Load_u / 10, GPU_Load_u % 10);
+		snprintf(GPU_Load_c, sizeof GPU_Load_c, "로드율 : %u.%u%%", GPU_Load_u / 10, GPU_Load_u % 10);
 		
 		///RAM
 		snprintf(RAM_Hz_c, sizeof RAM_Hz_c, "%u.%u MHz", RAM_Hz / 1000000, (RAM_Hz / 100000) % 10);
@@ -269,7 +269,7 @@ public:
 		if (R_SUCCEEDED(sysclkCheck)) {
 			int RAM_GPU_Load = ramLoad[SysClkRamLoad_All] - ramLoad[SysClkRamLoad_Cpu];
 			snprintf(RAM_load_c, sizeof RAM_load_c, 
-				"Load: %u.%u%% (CPU %u.%u | GPU %u.%u)",
+				"로드율 : %u.%u%% (CPU %u.%u | GPU %u.%u)",
 				ramLoad[SysClkRamLoad_All] / 10, ramLoad[SysClkRamLoad_All] % 10,
 				ramLoad[SysClkRamLoad_Cpu] / 10, ramLoad[SysClkRamLoad_Cpu] % 10,
 				RAM_GPU_Load / 10, RAM_GPU_Load % 10);
@@ -287,7 +287,7 @@ public:
 				PCB_temperatureC / 1000, (PCB_temperatureC % 100) % 10,
 				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
 		}
-		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "Fan Rotation Level: %2.1f%%", Rotation_SpeedLevel_f * 100);
+		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "팬 커브 : %2.1f%%", Rotation_SpeedLevel_f * 100);
 		
 		///FPS
 		snprintf(FPS_var_compressed_c, sizeof FPS_var_compressed_c, "%u\n%2.1f", FPS, FPSavg);
@@ -301,7 +301,7 @@ public:
 			snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "%d:%02d", batTimeEstimate / 60, batTimeEstimate % 60);
 		}
 		else snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "-:--");
-		snprintf(BatteryDraw_c, sizeof BatteryDraw_c, "Battery Power Flow: %+.2fW[%s]", PowerConsumption, remainingBatteryLife);
+		snprintf(BatteryDraw_c, sizeof BatteryDraw_c, "소비전력 : %+.2fW [%s]", PowerConsumption, remainingBatteryLife);
 		mutexUnlock(&mutex_BatteryChecker);
 		
 	}
