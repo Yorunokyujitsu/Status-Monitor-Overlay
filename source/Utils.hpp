@@ -138,8 +138,6 @@ uintptr_t FPSavgaddress = 0;
 uint64_t PID = 0;
 uint32_t FPS = 0xFE;
 float FPSavg = 254;
-float FPSmin = 254;
-float FPSmax = 0;
 SharedMemory _sharedmemory = {};
 bool SharedMemoryUsed = false;
 uint32_t* MAGIC_shared = 0;
@@ -153,10 +151,6 @@ Handle remoteSharedMemory = 1;
 uint32_t realCPU_Hz = 0;
 uint32_t realGPU_Hz = 0;
 uint32_t realRAM_Hz = 0;
-uint32_t realCPU_mV = 0;
-uint32_t realGPU_mV = 0;
-uint32_t realRAM_mV = 0;
-uint32_t realSOC_mV = 0;
 uint32_t ramLoad[SysClkRamLoad_EnumMax];
 uint8_t refreshRate = 0;
 
@@ -413,10 +407,6 @@ void Misc(void*) {
 				realCPU_Hz = sysclkCTX.realFreqs[SysClkModule_CPU];
 				realGPU_Hz = sysclkCTX.realFreqs[SysClkModule_GPU];
 				realRAM_Hz = sysclkCTX.realFreqs[SysClkModule_MEM];
-				realCPU_mV = sysclkCTX.realVolts[0];
-				realGPU_mV = sysclkCTX.realVolts[1];
-				realRAM_mV = sysclkCTX.realVolts[2];
-				realSOC_mV = sysclkCTX.realVolts[3];
 				ramLoad[SysClkRamLoad_All] = sysclkCTX.ramLoad[SysClkRamLoad_All];
 				ramLoad[SysClkRamLoad_Cpu] = sysclkCTX.ramLoad[SysClkRamLoad_Cpu];
 			}
@@ -467,15 +457,10 @@ void Misc(void*) {
 			if (SharedMemoryUsed) {
 				FPS = *FPS_shared;
 				FPSavg = 19'200'000.f / (std::accumulate<uint32_t*, float>(FPSticks_shared, FPSticks_shared+10, 0) / 10);
-				if (FPSavg > FPSmax)	FPSmax = FPSavg;
-				if (FPSavg < FPSmin)	FPSmin = FPSavg;
 			}
 		}
-		else {
-			FPSavg = 254;
-			FPSmin = 254;
-			FPSmax = 0;
-		}
+		else FPSavg = 254;
+
 		// Interval
 		mutexUnlock(&mutex_Misc);
 		svcSleepThread(TeslaFPS < 10 ? (1'000'000'000 / TeslaFPS) : 100'000'000);
@@ -909,7 +894,6 @@ struct FullSettings {
 struct MiniSettings {
 	uint8_t refreshRate;
 	bool realFrequencies;
-	bool realVolts;
 	size_t handheldFontSize;
 	size_t dockedFontSize;
 	uint16_t backgroundColor;
@@ -923,7 +907,6 @@ struct MiniSettings {
 struct MicroSettings {
 	uint8_t refreshRate;
 	bool realFrequencies;
-	bool realVolts;
 	size_t handheldFontSize;
 	size_t dockedFontSize;
 	uint8_t alignTo;
@@ -960,7 +943,6 @@ struct FpsGraphSettings {
 
 void GetConfigSettings(MiniSettings* settings) {
 	settings -> realFrequencies = true;
-	settings -> realVolts = true;
 	settings -> handheldFontSize = 15;
 	settings -> dockedFontSize = 15;
 	convertStrToRGBA4444("#1117", &(settings -> backgroundColor));
@@ -1003,11 +985,6 @@ void GetConfigSettings(MiniSettings* settings) {
 		key = parsedData["mini"]["real_freqs"];
 		convertToUpper(key);
 		settings -> realFrequencies = !(key.compare("TRUE"));
-	}
-	if (parsedData["mini"].find("real_volts") != parsedData["mini"].end()) { 
-		key = parsedData["mini"]["real_volts"]; 
-		convertToUpper(key); 
-		settings -> realVolts = !(key.compare("TRUE")); 
 	}
 
 	long maxFontSize = 22;
@@ -1082,14 +1059,13 @@ void GetConfigSettings(MiniSettings* settings) {
 
 void GetConfigSettings(MicroSettings* settings) {
 	settings -> realFrequencies = true;
-	settings -> realVolts = true;
 	settings -> handheldFontSize = 15;
 	settings -> dockedFontSize = 15;
 	settings -> alignTo = 1;
 	convertStrToRGBA4444("#1117", &(settings -> backgroundColor));
 	convertStrToRGBA4444("#0C0F", &(settings -> catColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> textColor));
-	settings -> show = "FPS+CPU+GPU+RAM+TEMP+PWR";
+	settings -> show = "FPS+CPU+GPU+RAM+TEMP+FAN+PWR";
 	settings -> showRAMLoad = true;
 	settings -> setPosBottom = false;
 	settings -> refreshRate = 1;
@@ -1128,11 +1104,6 @@ void GetConfigSettings(MicroSettings* settings) {
 		convertToUpper(key);
 		settings -> realFrequencies = !(key.compare("TRUE"));
 	}
-	if (parsedData["micro"].find("real_volts") != parsedData["micro"].end()) { 
-		key = parsedData["micro"]["real_volts"]; 
-		convertToUpper(key); 
-		settings -> realVolts = !(key.compare("TRUE")); 
-	} 
 	if (parsedData["micro"].find("text_align") != parsedData["micro"].end()) {
 		key = parsedData["micro"]["text_align"];
 		convertToUpper(key);

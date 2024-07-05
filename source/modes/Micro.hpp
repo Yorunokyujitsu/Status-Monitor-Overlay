@@ -13,10 +13,6 @@ private:
 	char Rotation_SpeedLevel_c[64] = "";
 	char Battery_c[512];
 	char batteryCharge[10] = ""; // Declare the batteryCharge variable
-	char CPU_volt_c[10];
-	char GPU_volt_c[10];
-	char RAM_volt_c[16];
-	char SOC_volt_c[10];
 
 	uint32_t margin = 12;
 	uint32_t margin_0 = 15;
@@ -27,8 +23,8 @@ private:
 	std::pair<u32, u32> CPU_dimensions;
 	std::pair<u32, u32> GPU_dimensions;
 	std::pair<u32, u32> RAM_dimensions;
-	std::pair<u32, u32> TEMPEED_dimensions;
-	//std::pair<u32, u32> FAN_dimensions;
+	std::pair<u32, u32> TEMP_dimensions;
+	std::pair<u32, u32> FAN_dimensions;
 	std::pair<u32, u32> PWR_dimensions;
 	std::pair<u32, u32> FPS_dimensions;
 	bool Initialized = false;
@@ -68,14 +64,14 @@ public:
 		auto Status = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, u16 x, u16 y, u16 w, u16 h) {
 
 			if (!Initialized) {
-				CPU_dimensions = renderer->drawString("CPU 100%△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
+				CPU_dimensions = renderer->drawString("CPU [100%,100%,100%,100%]△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				GPU_dimensions = renderer->drawString("GPU 100.0%△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				if (R_FAILED(sysclkCheck) || !settings.showRAMLoad) {
 					RAM_dimensions = renderer->drawString("RAM 4.4/44.4GB△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				}
 				else RAM_dimensions = renderer->drawString("RAM 100.0%△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
-				TEMPEED_dimensions = renderer->drawString("TEMP 88.8/88.8/88.8\u00B0C | 100%", false, 0, fontsize, fontsize, renderer->a(0x0000));
-				/*FAN_dimensions = renderer->drawString("FAN 100.0%", false, 0, fontsize, fontsize, renderer->a(0x0000));*/
+				TEMPEED_dimensions = renderer->drawString("TEMP 88.8/88.8/88.8\u00B0C", false, 0, fontsize, fontsize, renderer->a(0x0000));
+				FAN_dimensions = renderer->drawString("FAN 100.0%", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				PWR_dimensions = renderer->drawString("PWR 100.0%@-15.5W [99:99]", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				FPS_dimensions = renderer->drawString("FPS 44.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				auto spacesize = renderer->drawString(" ", false, 0, fontsize, fontsize, renderer->a(0x0000));
@@ -100,15 +96,15 @@ public:
 						flags |= 1 << 2;
 					}
 					else if (!key.compare("TEMP") && !(flags & 1 << 3)) {
-						text_width += TEMPEED_dimensions.first;
+						text_width += TEMP_dimensions.first;
 						entry_count += 1;
 						flags |= 1 << 3;
 					}
-					/*else if (!key.compare("FAN") && !(flags & 1 << 4)) {
+					else if (!key.compare("FAN") && !(flags & 1 << 4)) {
 						text_width += FAN_dimensions.first;
 						entry_count += 1;
 						flags |= 1 << 4;
-					}*/
+					}
 					else if (!key.compare("PWR") && !(flags & 1 << 4)) {
 						text_width += PWR_dimensions.first;
 						entry_count += 1;
@@ -146,10 +142,6 @@ public:
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(CPU_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += CPU_dimensions.first + margin;
-					if (settings.realVolts) {
-						auto dimensions_v = renderer->drawString(" | 4444mV", false, 0, fontsize, fontsize, renderer->a(0x0000));
-						offset += dimensions_v.first + margin_0;
-					}
 					flags |= 1 << 0;
 				}
 				else if (!key.compare("GPU") && !(flags & 1 << 1)) {
@@ -157,10 +149,6 @@ public:
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(GPU_Load_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += GPU_dimensions.first + margin;
-					if (settings.realVolts) {
-						auto dimensions_v = renderer->drawString(" | 4444mV", false, 0, fontsize, fontsize, renderer->a(0x0000));
-						offset += dimensions_v.first + margin;
-					}
 					flags |= 1 << 1;
 				}
 				else if (!key.compare("RAM") && !(flags & 1 << 2)) {
@@ -168,40 +156,22 @@ public:
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(RAM_var_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += RAM_dimensions.first + margin;
-					if (settings.realVolts) {
-						auto dimensions_v = renderer->drawString(" | 4444/4444mV", false, 0, fontsize, fontsize, renderer->a(0x0000));
-						offset += dimensions_v.first + margin;
-					}
 					flags |= 1 << 2;
 				}
-				/*else if (!key.compare("TEMP") && !(flags & 1 << 3)) {
+				else if (!key.compare("TEMP") && !(flags & 1 << 3)) {
 					auto dimensions_s = renderer->drawString("TEMP", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(skin_temperature_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					renderer->drawString(Rotation_SpeedLevel_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += TEMP_dimensions.first + margin_1;
 					flags |= 1 << 3;
-				}*/
-				else if (!key.compare("TEMP") && !(flags & 1 << 3)) {
-    				auto dimensions_s = renderer->drawString("TEMP", false, offset, base_y + fontsize, fontsize, renderer->a(settings.catColor));
-    				uint32_t offset_s = offset + dimensions_s.first + margin;
-    
-    				auto temp_dimensions = renderer->drawString(skin_temperature_c, false, offset_s, base_y + fontsize, fontsize, renderer->a(settings.textColor));
-    				offset_s += temp_dimensions.first + margin;
-    
-    				auto speed_dimensions = renderer->drawString(Rotation_SpeedLevel_c, false, offset_s, base_y + fontsize, fontsize, renderer->a(settings.textColor));
-    				offset_s += speed_dimensions.first + margin;
-    
-    				offset += TEMPEED_dimensions.first + margin_1;
-    				flags |= 1 << 3;
 				}
-				/*else if (!key.compare("FAN") && !(flags & 1 << 4)) {
+				else if (!key.compare("FAN") && !(flags & 1 << 4)) {
 					auto dimensions_s = renderer->drawString("FAN", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(Rotation_SpeedLevel_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += FAN_dimensions.first + margin;
 					flags |= 1 << 4;
-				}*/
+				}
 				else if (!key.compare("PWR") && !(flags & 1 << 4)) {
 					auto dimensions_s = renderer->drawString("PWR", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
@@ -241,7 +211,7 @@ public:
 
 		//Make stuff ready to print
 		///CPU
-		/*if (idletick0 > systemtickfrequency_impl)
+		if (idletick0 > systemtickfrequency_impl)
 			strcpy(CPU_Usage0, "0%");
 		else snprintf(CPU_Usage0, sizeof CPU_Usage0, "%.0f%%", (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100);
 		if (idletick1 > systemtickfrequency_impl)
@@ -252,22 +222,7 @@ public:
 		else snprintf(CPU_Usage2, sizeof CPU_Usage2, "%.0f%%", (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100);
 		if (idletick3 > systemtickfrequency_impl)
 			strcpy(CPU_Usage3, "0%");
-		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "%.0f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);*/
-
-		if (idletick0 > systemtickfrequency_impl) idletick0 = systemtickfrequency_impl;
-		if (idletick1 > systemtickfrequency_impl) idletick1 = systemtickfrequency_impl;
-		if (idletick2 > systemtickfrequency_impl) idletick2 = systemtickfrequency_impl;
-		if (idletick3 > systemtickfrequency_impl) idletick3 = systemtickfrequency_impl;
-		double cpu_usage0 = (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100;
-		double cpu_usage1 = (1.d - ((double)idletick1 / systemtickfrequency_impl)) * 100;
-		double cpu_usage2 = (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100;
-		double cpu_usage3 = (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100;
-		double cpu_usageM = 0;
-		if (cpu_usage0 > cpu_usageM)	cpu_usageM = cpu_usage0;
-		if (cpu_usage1 > cpu_usageM)	cpu_usageM = cpu_usage1;
-		if (cpu_usage2 > cpu_usageM)	cpu_usageM = cpu_usage2;
-		if (cpu_usage3 > cpu_usageM)	cpu_usageM = cpu_usage3;
-		snprintf(CPU_Usage0, sizeof CPU_Usage0, "%.0f%%", cpu_usageM);
+		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "%.0f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);
 
 		mutexLock(&mutex_Misc);
 		char difference[5] = "@";
@@ -285,27 +240,17 @@ public:
 		}
 		if (settings.realFrequencies && realCPU_Hz) {
 			snprintf(CPU_compressed_c, sizeof CPU_compressed_c, 
-				"%s%s%d.%d", 
-				CPU_Usage0, 
-				/*"[%s,%s,%s,%s]%s%d.%d", 
-				CPU_Usage0, CPU_Usage1, CPU_Usage2, CPU_Usage3, */
+				"[%s,%s,%s,%s]%s%d.%d", 
+				CPU_Usage0, CPU_Usage1, CPU_Usage2, CPU_Usage3, 
 				difference, 
 				realCPU_Hz / 1000000, (realCPU_Hz / 100000) % 10);
-			if (settings.realVolts) {
-				snprintf(CPU_volt_c, sizeof CPU_volt_c, " | %dmV", realCPU_mV);
-				strncat(CPU_compressed_c, CPU_volt_c, sizeof CPU_compressed_c);
-			}
 		}
 		else {
 			snprintf(CPU_compressed_c, sizeof CPU_compressed_c, 
-				"%s%s%d.%d", 
-				CPU_Usage0,
-				difference,
+				"[%s,%s,%s,%s]%s%d.%d", 
+				CPU_Usage0, CPU_Usage1, CPU_Usage2, CPU_Usage3, 
+				difference, 
 				CPU_Hz / 1000000, (CPU_Hz / 100000) % 10);
-			if (settings.realVolts) {
-				snprintf(CPU_volt_c, sizeof CPU_volt_c, " | %dmV", realCPU_mV);
-				strncat(CPU_compressed_c, CPU_volt_c, sizeof CPU_compressed_c);
-			}
 		}
 		
 		///GPU
@@ -333,10 +278,6 @@ public:
 				GPU_Load_u / 10, GPU_Load_u % 10, 
 				difference, 
 				realGPU_Hz / 1000000, (realGPU_Hz / 100000) % 10);
-			if (settings.realVolts) {
-				snprintf(GPU_volt_c, sizeof GPU_volt_c, " | %dmV", realGPU_mV);
-				strncat(GPU_Load_c, GPU_volt_c, sizeof GPU_Load_c);
-			}
 		}
 		else {
 			snprintf(GPU_Load_c, sizeof GPU_Load_c, 
@@ -344,10 +285,6 @@ public:
 				GPU_Load_u / 10, GPU_Load_u % 10, 
 				difference, 
 				GPU_Hz / 1000000, (GPU_Hz / 100000) % 10);
-			if (settings.realVolts) {
-				snprintf(GPU_volt_c, sizeof GPU_volt_c, " | %dmV", realGPU_mV);
-				strncat(GPU_Load_c, GPU_volt_c, sizeof GPU_Load_c);
-			}
 		}
 		
 		///RAM
@@ -391,10 +328,6 @@ public:
 			snprintf(RAM_var_compressed_c, sizeof RAM_var_compressed_c, 
 				"%s%s%d.%d", 
 				MICRO_RAM_all_c, difference, realRAM_Hz / 1000000, (realRAM_Hz / 100000) % 10);
-			if (settings.realVolts) {
-				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", realRAM_mV/10000, realRAM_mV%10000);
-				strncat(RAM_var_compressed_c, RAM_volt_c, sizeof RAM_var_compressed_c);
-			}
 		}
 		else {
 			snprintf(RAM_var_compressed_c, sizeof RAM_var_compressed_c, 
@@ -417,23 +350,21 @@ public:
 		///Thermal
 		if (hosversionAtLeast(10,0,0)) {
 			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%2.1f/%2.1f/%hu.%hhu\u00B0C | %2.0f%%",
+				"%2.1f/%2.1f/%hu.%hhu\u00B0C", 
 				SOC_temperatureF, PCB_temperatureF, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10,
-				Rotation_SpeedLevel_f * 100);
+				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
 		}
 		else {
 			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%hu.%hhu/%hu.%hhu/%hu.%hhu\u00B0C | %2.0f%%",
+				"%hu.%hhu/%hu.%hhu/%hu.%hhu\u00B0C", 
 				SOC_temperatureC / 1000, (SOC_temperatureC / 100) % 10, 
 				PCB_temperatureC / 1000, (PCB_temperatureC / 100) % 10, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10,
-				Rotation_SpeedLevel_f * 100);
+				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
 		}
 		mutexUnlock(&mutex_BatteryChecker);
 
 		///FAN
-		/*snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "%2.1f%%", Rotation_SpeedLevel_f * 100);*/
+		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "%2.1f%%", Rotation_SpeedLevel_f * 100);
 		
 		///FPS
 		snprintf(FPS_var_compressed_c, sizeof FPS_var_compressed_c, "%2.1f", FPSavg);
