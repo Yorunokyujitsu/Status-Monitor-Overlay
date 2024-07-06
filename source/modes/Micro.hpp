@@ -15,9 +15,11 @@ private:
 	char batteryCharge[10] = ""; // Declare the batteryCharge variable
 
 	uint32_t margin = 12;
-	uint32_t margin_0 = 15;
-	uint32_t margin_1 = 20;
-	uint32_t margin_2 = 42;
+	uint32_t margin_FC = 45;
+	uint32_t margin_CG = 0;
+	uint32_t margin_GRT = 20;
+	uint32_t margin_TF = 35;
+	uint32_t margin_FP = 25;
 	
 
 	std::pair<u32, u32> CPU_dimensions;
@@ -70,7 +72,7 @@ public:
 					RAM_dimensions = renderer->drawString("RAM 4.4/44.4GB△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				}
 				else RAM_dimensions = renderer->drawString("RAM 100.0%△4444.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
-				TEMPEED_dimensions = renderer->drawString("TEMP 88.8/88.8/88.8\u00B0C", false, 0, fontsize, fontsize, renderer->a(0x0000));
+				TEMP_dimensions = renderer->drawString("TEMP 88.8/88.8/88.8\u00B0C", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				FAN_dimensions = renderer->drawString("FAN 100.0%", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				PWR_dimensions = renderer->drawString("PWR 100.0%@-15.5W [99:99]", false, 0, fontsize, fontsize, renderer->a(0x0000));
 				FPS_dimensions = renderer->drawString("FPS 44.4", false, 0, fontsize, fontsize, renderer->a(0x0000));
@@ -105,15 +107,15 @@ public:
 						entry_count += 1;
 						flags |= 1 << 4;
 					}
-					else if (!key.compare("PWR") && !(flags & 1 << 4)) {
+					else if (!key.compare("PWR") && !(flags & 1 << 5)) {
 						text_width += PWR_dimensions.first;
 						entry_count += 1;
-						flags |= 1 << 4;
+						flags |= 1 << 5;
 					}
-					else if (!key.compare("FPS") && !(flags & 1 << 5)) {
+					else if (!key.compare("FPS") && !(flags & 1 << 6)) {
 						fps_width = FPS_dimensions.first;
 						showFPS = true;
-						flags |= 1 << 5;
+						flags |= 1 << 6;
 					}
 				}
 				text_width += (margin * entry_count);
@@ -141,50 +143,50 @@ public:
 					auto dimensions_s = renderer->drawString("CPU", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(CPU_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += CPU_dimensions.first + margin;
+					offset += CPU_dimensions.first + margin_CG;
 					flags |= 1 << 0;
 				}
 				else if (!key.compare("GPU") && !(flags & 1 << 1)) {
 					auto dimensions_s = renderer->drawString("GPU", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(GPU_Load_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += GPU_dimensions.first + margin;
+					offset += GPU_dimensions.first + margin_GRT;
 					flags |= 1 << 1;
 				}
 				else if (!key.compare("RAM") && !(flags & 1 << 2)) {
 					auto dimensions_s = renderer->drawString("RAM", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(RAM_var_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += RAM_dimensions.first + margin;
+					offset += RAM_dimensions.first + margin_GRT;
 					flags |= 1 << 2;
 				}
 				else if (!key.compare("TEMP") && !(flags & 1 << 3)) {
 					auto dimensions_s = renderer->drawString("TEMP", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(skin_temperature_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += TEMP_dimensions.first + margin_1;
+					offset += TEMP_dimensions.first + margin_TF;
 					flags |= 1 << 3;
 				}
 				else if (!key.compare("FAN") && !(flags & 1 << 4)) {
 					auto dimensions_s = renderer->drawString("FAN", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(Rotation_SpeedLevel_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += FAN_dimensions.first + margin;
+					offset += FAN_dimensions.first + margin_FP;
 					flags |= 1 << 4;
 				}
-				else if (!key.compare("PWR") && !(flags & 1 << 4)) {
+				else if (!key.compare("PWR") && !(flags & 1 << 5)) {
 					auto dimensions_s = renderer->drawString("PWR", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(Battery_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
 					offset += PWR_dimensions.first + margin;
-					flags |= 1 << 4;
+					flags |= 1 << 5;
 				}
-				else if (!key.compare("FPS") && !(flags & 1 << 5)) {
+				else if (!key.compare("FPS") && !(flags & 1 << 6)) {
 					auto dimensions_s = renderer->drawString("ㅤFPS", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(FPS_var_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += FPS_dimensions.first + margin_2;
-					flags |= 1 << 5;
+					offset += FPS_dimensions.first + margin_FC;
+					flags |= 1 << 6;
 				}
 			}
 		});
@@ -333,10 +335,6 @@ public:
 			snprintf(RAM_var_compressed_c, sizeof RAM_var_compressed_c, 
 				"%s%s%d.%d", 
 				MICRO_RAM_all_c, difference, RAM_Hz / 1000000, (RAM_Hz / 1000000) % 10);
-			if (settings.realVolts) {
-				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", realRAM_mV/10000, realRAM_mV%10000);
-				strncat(RAM_var_compressed_c, RAM_volt_c, sizeof RAM_var_compressed_c);
-			}
 		}
 		
 		char remainingBatteryLife[8];

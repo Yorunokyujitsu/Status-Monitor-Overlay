@@ -460,7 +460,7 @@ void Misc(void*) {
 			}
 		}
 		else FPSavg = 254;
-
+		
 		// Interval
 		mutexUnlock(&mutex_Misc);
 		svcSleepThread(TeslaFPS < 10 ? (1'000'000'000 / TeslaFPS) : 100'000'000);

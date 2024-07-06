@@ -365,7 +365,7 @@ public:
 				strcat(Temp, SoCPCB_temperature_c);
 				flags |= 1 << 5;			
 			}
-			else if (!key.compare("FPS") && !(flags & 1 << 6) && GameRunning) {
+			else if (!key.compare("FPS") && !(flags & 1 << 6)) {
 				if (Temp[0]) {
 					strcat(Temp, "\n");
 				}

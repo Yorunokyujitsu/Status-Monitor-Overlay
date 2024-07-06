@@ -85,7 +85,7 @@ public:
 				}
 				else
 					renderer->drawString("타입 : 연결 없음", false, 20, 280, 18, renderer->a(0xFFFF));
-		}
+			}
 
 		});
 
