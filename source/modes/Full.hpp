@@ -68,11 +68,11 @@ public:
 			///CPU
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 
-				uint32_t height_offset = 155;
+				uint32_t height_offset = 192;
 				if (realCPU_Hz && settings.showRealFreqs) {
-					height_offset = 162;
+					height_offset = 200;
 				}
-				renderer->drawString("· CPU", false, COMMON_MARGIN, 120, 20, renderer->a(0xFFFF));
+				renderer->drawString("· CPU", false, COMMON_MARGIN, 162, 20, renderer->a(settings.catColor));
 				auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 				uint32_t offset = COMMON_MARGIN + dimensions.first;
 				if (settings.showTargetFreqs) {
@@ -92,18 +92,18 @@ public:
 				else if (realCPU_Hz && settings.showDeltas && (settings.showRealFreqs || settings.showTargetFreqs)) {
 					renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(0xFFFF));
 				}
-				renderer->drawString(CPU_compressed_c, false, COMMON_MARGIN, height_offset + 30, 15, renderer->a(0xFFFF));
+				renderer->drawString(CPU_compressed_c, false, COMMON_MARGIN, height_offset + 23, 15, renderer->a(0xFFFF));
 			}
 			
 			///GPU
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck) || R_SUCCEEDED(nvCheck)) {
 				
-				uint32_t height_offset = 320;
+				uint32_t height_offset = 327;
 				if (realGPU_Hz && settings.showRealFreqs) {
-					height_offset = 327;
+					height_offset = 337;
 				}
 
-				renderer->drawString("· GPU", false, COMMON_MARGIN, 285, 20, renderer->a(0xFFFF));
+				renderer->drawString("· GPU", false, COMMON_MARGIN, 300, 20, renderer->a(settings.catColor));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 					auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 					uint32_t offset = COMMON_MARGIN + dimensions.first;
@@ -135,12 +135,12 @@ public:
 			///RAM
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck) || R_SUCCEEDED(Hinted)) {
 				
-				uint32_t height_offset = 410;
+				uint32_t height_offset = 415;
 				if (realRAM_Hz && settings.showRealFreqs) {
 					height_offset += 7;
 				}
 
-				renderer->drawString("· RAM", false, COMMON_MARGIN, 375, 20, renderer->a(0xFFFF));
+				renderer->drawString("· RAM", false, COMMON_MARGIN, 385, 20, renderer->a(settings.catColor));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 					auto dimensions = renderer->drawString("목표 주파수 : ", false, COMMON_MARGIN, height_offset, 15, renderer->a(0x0000));
 					uint32_t offset = COMMON_MARGIN + dimensions.first;
@@ -174,30 +174,29 @@ public:
 			
 			///Thermal
 			if (R_SUCCEEDED(tsCheck) || R_SUCCEEDED(tcCheck) || R_SUCCEEDED(fanCheck)) {
-				renderer->drawString("· 메인보드", false, 20, 550, 20, renderer->a(0xFFFF));
-				if (R_SUCCEEDED(tsCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 575, 15, renderer->a(0xFFFF));
+				renderer->drawString("· 메인보드", false, 20, 555, 20, renderer->a(settings.catColor));
+				if (R_SUCCEEDED(tsCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 578, 15, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(tsCheck)) {
-					auto dimensions1 = renderer->drawString("온도 : ", false, 0, 590, 15, renderer->a(0x0000));
-					auto dimensions2 = renderer->drawString("소켓 \n기판 \n표면 ", false, 0, 590, 15, renderer->a(0x0000));
-					renderer->drawString("온도 :", false, COMMON_MARGIN, 590, 15, renderer->a(0xFFFF));
-					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 590, 15, renderer->a(0xFFFF));
-					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 590, 15, renderer->a(0xFFFF));
+					auto dimensions1 = renderer->drawString("온도 : ", false, 0, 593, 15, renderer->a(0x0000));
+					auto dimensions2 = renderer->drawString("소켓 \n기판 \n표면 ", false, 0, 593, 15, renderer->a(0x0000));
+					renderer->drawString("온도 :", false, COMMON_MARGIN, 593, 15, renderer->a(0xFFFF));
+					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(0xFFFF));
+					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 593, 15, renderer->a(0xFFFF));
 				}
-				if (R_SUCCEEDED(fanCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 635, 15, renderer->a(0xFFFF));
+				if (R_SUCCEEDED(fanCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 638, 15, renderer->a(0xFFFF));
 			}
 			
 			///FPS
 			if (GameRunning) {
 				uint32_t width_offset = 230;
 				if (settings.showFPS == true) {
-					auto dimensions = renderer->drawString("PFPS : \nFPS   :", false, COMMON_MARGIN + width_offset, 120, 20, renderer->a(0xFFFF));
+					auto dimensions = renderer->drawString("· PFPS : \n· FPS   :", false, COMMON_MARGIN + width_offset, 110, 20, renderer->a(settings.catColor));
 					uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
-					renderer->drawString(FPS_var_compressed_c, false, offset, 120, 20, renderer->a(0xFFFF));
+					renderer->drawString(FPS_var_compressed_c, false, offset, 110, 20, renderer->a(0xFFFF));
 				}
 				if ((settings.showRES == true) && *API_shared == 1) {
-					width_offset = 200;
-					renderer->drawString("게임 해상도 :", false, COMMON_MARGIN + width_offset, 185, 20, renderer->a(0xFFFF));
-					renderer->drawString(Resolutions_c, false, COMMON_MARGIN + width_offset, 205, 20, renderer->a(0xFFFF));
+					renderer->drawString("· 게임 해상도", false, COMMON_MARGIN, 110, 20, renderer->a(settings.catColor));
+					renderer->drawString(Resolutions_c, false, COMMON_MARGIN, 130, 15, renderer->a(0xFFFF));
 				}
 			}
 			

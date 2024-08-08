@@ -902,6 +902,7 @@ bool convertStrToRGBA4444(std::string hexColor, uint16_t* returnValue) {
 
 struct FullSettings {
 	uint8_t refreshRate;
+	uint16_t catColor;
 	bool setPosRight;
 	bool showRealFreqs;
 	bool showDeltas;
@@ -1384,6 +1385,7 @@ void GetConfigSettings(FpsGraphSettings* settings) {
 }
 
 void GetConfigSettings(FullSettings* settings) {
+	convertStrToRGBA4444("#0C0F", &(settings -> catColor));
 	settings -> setPosRight = false;
 	settings -> refreshRate = 1;
 	settings -> showRealFreqs = true;
