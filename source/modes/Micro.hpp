@@ -241,7 +241,7 @@ public:
 
 		//Make stuff ready to print
 		///CPU
-		/*if (idletick0 > systemtickfrequency_impl)
+		/* if (idletick0 > systemtickfrequency_impl)
 			strcpy(CPU_Usage0, "0%");
 		else snprintf(CPU_Usage0, sizeof CPU_Usage0, "%.0f%%", (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100);
 		if (idletick1 > systemtickfrequency_impl)
@@ -252,7 +252,7 @@ public:
 		else snprintf(CPU_Usage2, sizeof CPU_Usage2, "%.0f%%", (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100);
 		if (idletick3 > systemtickfrequency_impl)
 			strcpy(CPU_Usage3, "0%");
-		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "%.0f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);*/
+		else snprintf(CPU_Usage3, sizeof CPU_Usage3, "%.0f%%", (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100); */
 
 		if (idletick0 > systemtickfrequency_impl) idletick0 = systemtickfrequency_impl;
 		if (idletick1 > systemtickfrequency_impl) idletick1 = systemtickfrequency_impl;
@@ -287,8 +287,6 @@ public:
 			snprintf(CPU_compressed_c, sizeof CPU_compressed_c, 
 				"%s%s%d.%d", 
 				CPU_Usage0, 
-				/*"[%s,%s,%s,%s]%s%d.%d", 
-				CPU_Usage0, CPU_Usage1, CPU_Usage2, CPU_Usage3, */
 				difference, 
 				realCPU_Hz / 1000000, (realCPU_Hz / 100000) % 10);
 			if (settings.realVolts) {
@@ -432,9 +430,6 @@ public:
 		}
 		mutexUnlock(&mutex_BatteryChecker);
 
-		///FAN
-		/*snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "%2.1f%%", Rotation_SpeedLevel_f * 100);*/
-		
 		///FPS
 		snprintf(FPS_var_compressed_c, sizeof FPS_var_compressed_c, "%2.1f", FPSavg);
 

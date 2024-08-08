@@ -181,7 +181,7 @@ public:
 					entry_count++;
 					flags |= (1 << 6);
 				}
-				else if (!key.compare("RES") && !(flags & 1 << 7)) {
+				else if (!key.compare("RES") && !(flags & 1 << 7) && GameRunning) {
 					if (print_text[0])
 						strcat(print_text, "\n");
 					strcat(print_text, " RES");
@@ -367,10 +367,11 @@ public:
 		}
 		char MINI_SOC_volt_c[7] = "";
 		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "%2.1f%%", Rotation_SpeedLevel_f * 100);
+		
 		if (settings.realVolts) {
 			snprintf(MINI_SOC_volt_c, sizeof(MINI_SOC_volt_c), "%umV", realSOC_mV);
 		}
-
+		
 		if (GameRunning && renderCalls_shared && resolutionShow) {
 			if (!resolutionLookup) {
 				renderCalls_shared[0].calls = 0xFFFF;
@@ -508,8 +509,6 @@ public:
 				}
 				char Temp_s[8] = "";
 				snprintf(Temp_s, sizeof(Temp_s), "%2.1f", FPSavg);
-				/*char Temp_s[64] = "";
-				snprintf(Temp_s, sizeof(Temp_s), "%2.1f [Min:%2.1f - Max:%2.1f]", FPSavg, FPSmin, FPSmax);*/
 				strcat(Temp, Temp_s);
 				flags |= 1 << 6;			
 			}

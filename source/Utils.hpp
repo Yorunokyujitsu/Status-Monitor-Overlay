@@ -485,7 +485,7 @@ void Misc(void*) {
 			}
 		}
 		else FPSavg = 254;
-
+		
 		// Interval
 		mutexUnlock(&mutex_Misc);
 		svcSleepThread(TeslaFPS < 10 ? (1'000'000'000 / TeslaFPS) : 100'000'000);
@@ -910,6 +910,7 @@ bool convertStrToRGBA4444(std::string hexColor, uint16_t* returnValue) {
 
 struct FullSettings {
 	uint8_t refreshRate;
+	uint16_t catColor;
 	bool setPosRight;
 	bool showRealFreqs;
 	bool showDeltas;
@@ -1110,7 +1111,7 @@ void GetConfigSettings(MicroSettings* settings) {
 	convertStrToRGBA4444("#1117", &(settings -> backgroundColor));
 	convertStrToRGBA4444("#0C0F", &(settings -> catColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> textColor));
-	settings -> show = "FPS+CPU+GPU+RAM+TEMP+PWR";
+	settings -> show = "FPS+CPU+GPU+RAM+TEMP+FAN+PWR";
 	settings -> showRAMLoad = true;
 	settings -> setPosBottom = false;
 	settings -> refreshRate = 1;
@@ -1153,7 +1154,7 @@ void GetConfigSettings(MicroSettings* settings) {
 		key = parsedData["micro"]["real_volts"]; 
 		convertToUpper(key); 
 		settings -> realVolts = !(key.compare("TRUE")); 
-	} 
+	}
 	if (parsedData["micro"].find("text_align") != parsedData["micro"].end()) {
 		key = parsedData["micro"]["text_align"];
 		convertToUpper(key);
@@ -1406,6 +1407,7 @@ void GetConfigSettings(FpsGraphSettings* settings) {
 }
 
 void GetConfigSettings(FullSettings* settings) {
+	convertStrToRGBA4444("#0C0F", &(settings -> catColor));
 	settings -> setPosRight = false;
 	settings -> refreshRate = 1;
 	settings -> showRealFreqs = true;
