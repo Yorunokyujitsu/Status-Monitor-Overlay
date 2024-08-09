@@ -165,7 +165,7 @@ public:
 					entry_count++;
 					flags |= (1 << 6);
 				}
-				else if (!key.compare("RES") && !(flags & 1 << 7)) {
+				else if (!key.compare("RES") && !(flags & 1 << 7) && GameRunning) {
 					if (print_text[0])
 						strcat(print_text, "\n");
 					strcat(print_text, " RES");
