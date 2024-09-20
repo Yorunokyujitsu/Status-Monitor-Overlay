@@ -173,7 +173,7 @@ public:
 			}
 			
 			///Thermal
-			if (R_SUCCEEDED(tsCheck) || R_SUCCEEDED(tcCheck) || R_SUCCEEDED(fanCheck)) {
+			if (R_SUCCEEDED(tsCheck) || R_SUCCEEDED(tcCheck) || R_SUCCEEDED(pwmCheck)) {
 				renderer->drawString("· 메인보드", false, 20, 555, 20, renderer->a(settings.catColor));
 				if (R_SUCCEEDED(tsCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 578, 15, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(tsCheck)) {
@@ -183,7 +183,7 @@ public:
 					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(0xFFFF));
 					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 593, 15, renderer->a(0xFFFF));
 				}
-				if (R_SUCCEEDED(fanCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 638, 15, renderer->a(0xFFFF));
+				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 635, 15, renderer->a(0xFFFF));
 			}
 			
 			///FPS
@@ -299,7 +299,7 @@ public:
 				PCB_temperatureC / 1000, (PCB_temperatureC % 100) % 10,
 				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
 		}
-		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "팬 커브 : %2.1f%%", Rotation_SpeedLevel_f * 100);
+		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "팬 커브 : %2.1f%%", Rotation_Duty);
 		
 		///FPS
 		if (settings.showFPS == true) 
