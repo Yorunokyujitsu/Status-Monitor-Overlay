@@ -183,7 +183,7 @@ public:
 					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(0xFFFF));
 					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 593, 15, renderer->a(0xFFFF));
 				}
-				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 635, 15, renderer->a(0xFFFF));
+				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 638, 15, renderer->a(0xFFFF));
 			}
 			
 			///FPS
