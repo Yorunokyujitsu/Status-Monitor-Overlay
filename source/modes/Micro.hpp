@@ -7,21 +7,19 @@ private:
 	char CPU_Usage1[32] = "";
 	char CPU_Usage2[32] = "";
 	char CPU_Usage3[32] = "";
+	char CPU_UsageM[32] = "";
 	char GPU_Load_c[32] = "";
 	char RAM_var_compressed_c[128] = "";
 	char skin_temperature_c[32] = "";
 	char Rotation_SpeedLevel_c[64] = "";
 	char Battery_c[512];
 	char batteryCharge[10] = ""; // Declare the batteryCharge variable
-	char CPU_volt_c[10];
-	char GPU_volt_c[10];
+	char CPU_volt_c[12];
+	char GPU_volt_c[12];
 	char RAM_volt_c[16];
-	char SOC_volt_c[10];
+	char SOC_volt_c[12];
 
 	uint32_t margin = 12;
-	uint32_t margin_0 = 15;
-	uint32_t margin_1 = 20;
-	uint32_t margin_2 = 42;
 	
 
 	std::pair<u32, u32> CPU_dimensions;
@@ -148,7 +146,7 @@ public:
 					offset += CPU_dimensions.first + margin;
 					if (settings.realVolts) {
 						auto dimensions_v = renderer->drawString(" | 4444mV", false, 0, fontsize, fontsize, renderer->a(0x0000));
-						offset += dimensions_v.first + margin_0;
+						offset += dimensions_v.first + margin;
 					}
 					flags |= 1 << 0;
 				}
@@ -192,7 +190,7 @@ public:
     				auto speed_dimensions = renderer->drawString(Rotation_SpeedLevel_c, false, offset_s, base_y + fontsize, fontsize, renderer->a(settings.textColor));
     				offset_s += speed_dimensions.first + margin;
     
-    				offset += TEMPEED_dimensions.first + margin_1;
+    				offset += TEMPEED_dimensions.first + margin;
     				flags |= 1 << 3;
 				}
 				/*else if (!key.compare("FAN") && !(flags & 1 << 4)) {
@@ -203,17 +201,18 @@ public:
 					flags |= 1 << 4;
 				}*/
 				else if (!key.compare("PWR") && !(flags & 1 << 4)) {
-					auto dimensions_s = renderer->drawString("PWR", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
-					uint32_t offset_s = offset + dimensions_s.first + margin;
-					renderer->drawString(Battery_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += PWR_dimensions.first + margin;
-					flags |= 1 << 4;
+    				auto dimensions_s = renderer->drawString("", false, 0, base_y + fontsize, fontsize, renderer->a(settings.catColor));
+    				auto dimensions_d = renderer->drawString(Battery_c, false, 0, fontsize, fontsize, renderer->a(0x0000));
+    				uint32_t offset_s = tsl::cfg::FramebufferWidth - (dimensions_d.first + dimensions_s.first + 40);
+    				renderer->drawString("PWR", false, offset_s, base_y + fontsize, fontsize, renderer->a(settings.catColor));
+    				renderer->drawString(Battery_c, false, tsl::cfg::FramebufferWidth - dimensions_d.first, base_y + fontsize, fontsize, renderer->a(settings.textColor));
+    				flags |= 1 << 4;
 				}
 				else if (!key.compare("FPS") && !(flags & 1 << 5)) {
 					auto dimensions_s = renderer->drawString("ㅤFPS", false, offset, base_y+fontsize, fontsize, renderer->a(settings.catColor));
 					uint32_t offset_s = offset + dimensions_s.first + margin;
 					renderer->drawString(FPS_var_compressed_c, false, offset_s, base_y+fontsize, fontsize, renderer->a(settings.textColor));
-					offset += FPS_dimensions.first + margin_2;
+					offset += FPS_dimensions.first + 42;
 					flags |= 1 << 5;
 				}
 			}
@@ -390,7 +389,7 @@ public:
 				"%s%s%d.%d", 
 				MICRO_RAM_all_c, difference, realRAM_Hz / 1000000, (realRAM_Hz / 100000) % 10);
 			if (settings.realVolts) {
-				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", realRAM_mV/10000, realRAM_mV%10000);
+				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", (realRAM_mV & 0xFFFF0000) >> 16, realRAM_mV & 0xFFFF);
 				strncat(RAM_var_compressed_c, RAM_volt_c, sizeof RAM_var_compressed_c);
 			}
 		}
@@ -399,7 +398,7 @@ public:
 				"%s%s%d.%d", 
 				MICRO_RAM_all_c, difference, RAM_Hz / 1000000, (RAM_Hz / 1000000) % 10);
 			if (settings.realVolts) {
-				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", realRAM_mV/10000, realRAM_mV%10000);
+				snprintf(RAM_volt_c, sizeof RAM_volt_c, " | %d/%dmV", (realRAM_mV & 0xFFFF0000) >> 16, realRAM_mV & 0xFFFF);
 				strncat(RAM_var_compressed_c, RAM_volt_c, sizeof RAM_var_compressed_c);
 			}
 		}
@@ -410,24 +409,15 @@ public:
 			snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "%d:%02d", batTimeEstimate / 60, batTimeEstimate % 60);
 		}
 		else snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "--:--");
-		snprintf(Battery_c, sizeof Battery_c, "%.1f%s@%+.1fW [%s]", (float)_batteryChargeInfoFields.RawBatteryCharge / 1000, "%", PowerConsumption, remainingBatteryLife);
+		
+		snprintf(Battery_c, sizeof Battery_c, "%.1f%s | %+.2fW [%s]ㅤ", (float)_batteryChargeInfoFields.RawBatteryCharge / 1000, "%", PowerConsumption, remainingBatteryLife);
 
 		///Thermal
-		if (hosversionAtLeast(10,0,0)) {
-			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%2.1f/%2.1f/%hu.%hhu\u00B0C | %2.0f%%",
-				SOC_temperatureF, PCB_temperatureF, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10,
-				Rotation_Duty);
-		}
-		else {
-			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%hu.%hhu/%hu.%hhu/%hu.%hhu\u00B0C | %2.0f%%",
-				SOC_temperatureC / 1000, (SOC_temperatureC / 100) % 10, 
-				PCB_temperatureC / 1000, (PCB_temperatureC / 100) % 10, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10,
-				Rotation_Duty);
-		}
+		snprintf(skin_temperature_c, sizeof skin_temperature_c, 
+			"%2.1f/%2.1f/%hu.%hhu\u00B0C | %2.0f%%", 
+			SOC_temperatureF, PCB_temperatureF, 
+			skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10, 
+			Rotation_Duty);
 		mutexUnlock(&mutex_BatteryChecker);
 
 		///FPS
