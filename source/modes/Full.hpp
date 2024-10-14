@@ -178,9 +178,9 @@ public:
 				if (R_SUCCEEDED(i2cCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 578, 15, renderer->a(0xFFFF));
 				if (R_SUCCEEDED(i2cCheck) || R_SUCCEEDED(tcCheck)) {
 					auto dimensions1 = renderer->drawString("온도 : ", false, 0, 593, 15, renderer->a(0x0000));
-					auto dimensions2 = renderer->drawString("소켓 \n기판 \n표면 ", false, 0, 593, 15, renderer->a(0x0000));
+					auto dimensions2 = renderer->drawString("SoC \nPCB \nSkin ", false, 0, 593, 15, renderer->a(0x0000));
 					renderer->drawString("온도 :", false, COMMON_MARGIN, 593, 15, renderer->a(0xFFFF));
-					renderer->drawString("소켓\n기판\n표면", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(0xFFFF));
+					renderer->drawString("SoC\nPCB\nSkin", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(0xFFFF));
 					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 593, 15, renderer->a(0xFFFF));
 				}
 				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 638, 15, renderer->a(0xFFFF));
