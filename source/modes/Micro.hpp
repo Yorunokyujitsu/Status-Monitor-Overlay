@@ -346,19 +346,10 @@ public:
 		snprintf(Battery_c, sizeof Battery_c, "%.1f%s@%+.1fW [%s]", (float)_batteryChargeInfoFields.RawBatteryCharge / 1000, "%", PowerConsumption, remainingBatteryLife);
 
 		///Thermal
-		if (hosversionAtLeast(10,0,0)) {
-			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%2.1f/%2.1f/%hu.%hhu\u00B0C", 
-				SOC_temperatureF, PCB_temperatureF, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
-		}
-		else {
-			snprintf(skin_temperature_c, sizeof skin_temperature_c, 
-				"%hu.%hhu/%hu.%hhu/%hu.%hhu\u00B0C", 
-				SOC_temperatureC / 1000, (SOC_temperatureC / 100) % 10, 
-				PCB_temperatureC / 1000, (PCB_temperatureC / 100) % 10, 
-				skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
-		}
+		snprintf(skin_temperature_c, sizeof skin_temperature_c, 
+			"%2.1f/%2.1f/%hu.%hhu\u00B0C", 
+			SOC_temperatureF, PCB_temperatureF, 
+			skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
 		mutexUnlock(&mutex_BatteryChecker);
 
 		///FAN
