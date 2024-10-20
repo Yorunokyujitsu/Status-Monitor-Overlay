@@ -1,4 +1,5 @@
 #pragma once
+#define ALWAYS_INLINE inline __attribute__((always_inline))
 #include "SaltyNX.h"
 
 #include "Battery.hpp"
@@ -27,6 +28,7 @@ extern "C"
 #define BASE_SNS_UOHM 5000
 
 //Common
+bool isMariko = false;
 Thread t0;
 Thread t1;
 Thread t2;
@@ -162,11 +164,11 @@ resolutionCalls* viewportCalls_shared = 0;
 uint32_t realCPU_Hz = 0;
 uint32_t realGPU_Hz = 0;
 uint32_t realRAM_Hz = 0;
+uint32_t ramLoad[SysClkRamLoad_EnumMax];
 uint32_t realCPU_mV = 0;
 uint32_t realGPU_mV = 0;
 uint32_t realRAM_mV = 0;
 uint32_t realSOC_mV = 0;
-uint32_t ramLoad[SysClkRamLoad_EnumMax];
 uint8_t refreshRate = 0;
 
 //Tweaks to nvInitialize so it will take less RAM
@@ -439,12 +441,12 @@ void Misc(void*) {
 				realCPU_Hz = sysclkCTX.realFreqs[SysClkModule_CPU];
 				realGPU_Hz = sysclkCTX.realFreqs[SysClkModule_GPU];
 				realRAM_Hz = sysclkCTX.realFreqs[SysClkModule_MEM];
+				ramLoad[SysClkRamLoad_All] = sysclkCTX.ramLoad[SysClkRamLoad_All];
+				ramLoad[SysClkRamLoad_Cpu] = sysclkCTX.ramLoad[SysClkRamLoad_Cpu];
 				realCPU_mV = sysclkCTX.realVolts[0];
 				realGPU_mV = sysclkCTX.realVolts[1];
 				realRAM_mV = sysclkCTX.realVolts[2];
 				realSOC_mV = sysclkCTX.realVolts[3];
-				ramLoad[SysClkRamLoad_All] = sysclkCTX.ramLoad[SysClkRamLoad_All];
-				ramLoad[SysClkRamLoad_Cpu] = sysclkCTX.ramLoad[SysClkRamLoad_Cpu];
 			}
 		}
 		
@@ -1035,7 +1037,7 @@ struct MicroSettings {
 	uint8_t refreshRate;
 	bool realFrequencies;
 	bool realVolts;
-	//bool showFullCPU; 
+	bool showFullCPU; 
 	size_t handheldFontSize;
 	size_t dockedFontSize;
 	uint8_t alignTo;
@@ -1205,14 +1207,14 @@ void GetConfigSettings(MiniSettings* settings) {
 void GetConfigSettings(MicroSettings* settings) {
 	settings -> realFrequencies = true;
 	settings -> realVolts = true;
-	//settings -> showFullCPU = false; 
-	settings -> handheldFontSize = 15;
-	settings -> dockedFontSize = 15;
+	settings -> showFullCPU = false; 
+	settings -> handheldFontSize = 12;
+	settings -> dockedFontSize = 12;
 	settings -> alignTo = 1;
 	convertStrToRGBA4444("#1117", &(settings -> backgroundColor));
 	convertStrToRGBA4444("#0C0F", &(settings -> catColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> textColor));
-	settings -> show = "FPS+CPU+GPU+RAM+TEMP+FAN+PWR";
+	settings -> show = "FPS+CPU+GPU+RAM+SoC+PCB+Skin+FAN+PWR";
 	settings -> showRAMLoad = true;
 	settings -> setPosBottom = false;
 	settings -> refreshRate = 1;
@@ -1256,11 +1258,11 @@ void GetConfigSettings(MicroSettings* settings) {
 		convertToUpper(key); 
 		settings -> realVolts = !(key.compare("TRUE")); 
 	}  
-	/*if (parsedData["micro"].find("show_full_cpu") != parsedData["micro"].end()) { 
+	if (parsedData["micro"].find("show_full_cpu") != parsedData["micro"].end()) { 
 		key = parsedData["micro"]["show_full_cpu"]; 
 		convertToUpper(key); 
 		settings -> showFullCPU = key.compare("FALSE"); 
-	}*/
+	}
 	if (parsedData["micro"].find("text_align") != parsedData["micro"].end()) {
 		key = parsedData["micro"]["text_align"];
 		convertToUpper(key);
@@ -1408,17 +1410,17 @@ void GetConfigSettings(FpsCounterSettings* settings) {
 }
 
 void GetConfigSettings(FpsGraphSettings* settings) {
-	settings -> showInfo = false;
+	settings -> showInfo = true;
 	settings -> setPos = 0;
 	convertStrToRGBA4444("#1117", &(settings -> backgroundColor));
 	convertStrToRGBA4444("#4444", &(settings -> fpsColor));
-	convertStrToRGBA4444("#F77F", &(settings -> borderColor));
+	convertStrToRGBA4444("#0C0F", &(settings -> borderColor));
 	convertStrToRGBA4444("#8888", &(settings -> dashedLineColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> maxFPSTextColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> minFPSTextColor));
 	convertStrToRGBA4444("#FFFF", &(settings -> mainLineColor));
 	convertStrToRGBA4444("#F0FF", &(settings -> roundedLineColor));
-	convertStrToRGBA4444("#0C0F", &(settings -> perfectLineColor));
+	convertStrToRGBA4444("#55EF", &(settings -> perfectLineColor));
 	settings -> refreshRate = 31;
 
 	FILE* configFileIn = fopen("sdmc:/config/ASAP-assist/sm_config.ini", "r");
