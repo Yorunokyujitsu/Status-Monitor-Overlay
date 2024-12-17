@@ -175,20 +175,16 @@ public:
 			}
 			
 			///FPS
-			if (GameRunning) {
-				uint32_t width_offset = 230;
-				if (settings.showFPS == true) {
-					auto dimensions = renderer->drawString("· PFPS : \n· FPS   :", false, COMMON_MARGIN + width_offset, 110, 20, renderer->a(tsl::statusTextColor));
-					uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
-					renderer->drawString(FPS_var_compressed_c, false, offset, 110, 20, renderer->a(tsl::defaultTextColor));
-				}
-				if ((settings.showRES == true) && (NxFps -> API) == 1) {
-					width_offset = 170;
-					renderer->drawString("· 게임 해상도", false, COMMON_MARGIN, 110, 20, renderer->a(tsl::statusTextColor));
-					renderer->drawString(Resolutions_c, false, COMMON_MARGIN, 130, 15, renderer->a(tsl::defaultTextColor));
-				}
-			}
+			uint32_t width_offset = 230;
 			
+			auto dimensions = renderer->drawString("· PFPS : \n· FPS   :", false, COMMON_MARGIN + width_offset, 110, 20, renderer->a(tsl::statusTextColor));
+			uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
+			renderer->drawString(FPS_var_compressed_c, false, offset, 110, 20, renderer->a(tsl::defaultTextColor));
+			
+			width_offset = 170;
+			renderer->drawString("· 게임 해상도", false, COMMON_MARGIN, 110, 20, renderer->a(tsl::statusTextColor));
+			renderer->drawString(Resolutions_c, false, COMMON_MARGIN, 130, 15, renderer->a(tsl::defaultTextColor));
+						
 			renderer->drawString(message.c_str(), false, COMMON_MARGIN, 693, 23, renderer->a(tsl::defaultTextColor));
 			
 		});

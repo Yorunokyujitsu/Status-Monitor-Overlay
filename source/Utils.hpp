@@ -1155,7 +1155,7 @@ ALWAYS_INLINE void GetConfigSettings(MiniSettings* settings) {
 			settings -> dockedFontSize = maxFontSize;
 		else settings -> dockedFontSize = fontsize;	
 	}
-	if (parsedData["mini"].find("show") != parsedData["micro"].end()) {
+	if (parsedData["mini"].find("show") != parsedData["mini"].end()) {
 		key = parsedData["mini"]["show"];
 		convertToUpper(key);
 		settings -> show = key;
