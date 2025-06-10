@@ -26,7 +26,7 @@ private:
 	FullSettings settings;
 	uint64_t systemtickfrequency_impl = systemtickfrequency;
 	std::string formattedKeyCombo = keyCombo;
-	std::string message = "Hold to Exit";
+	std::string message = "버튼을 입력하여 나가기";
 public:
     FullOverlay() { 
 		GetConfigSettings(&settings);
@@ -40,7 +40,7 @@ public:
 		}
 		deactivateOriginalFooter = true;
 		formatButtonCombination(formattedKeyCombo);
-		message = "Hold " + formattedKeyCombo + " to Exit";
+		message = "홈 메뉴 : " + formattedKeyCombo + " 홀드";
         StartThreads();
 	}
 	~FullOverlay() {
@@ -60,7 +60,7 @@ public:
 	uint8_t resolutionLookup = 0;
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", APP_VERSION);
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", APP_VERSION"-ASAP");
 
 		auto Status = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, u16 x, u16 y, u16 w, u16 h) {
 			
@@ -68,58 +68,58 @@ public:
 			///CPU
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 
-				uint32_t height_offset = 155;
+				uint32_t height_offset = 192;
 				if (realCPU_Hz && settings.showRealFreqs) {
-					height_offset = 162;
+					height_offset = 200;
 				}
-				renderer->drawString("CPU Usage:", false, COMMON_MARGIN, 120, 20, renderer->a(0xFFFF));
+				renderer->drawString("· CPU", false, COMMON_MARGIN, 162, 20, renderer->a(tsl::statusTextColor));
 				if (settings.showTargetFreqs) {
-					renderer->drawString(CPU_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+					renderer->drawString(CPU_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(tsl::defaultTextColor));
 				}
 				if (realCPU_Hz && settings.showRealFreqs) {
-					renderer->drawString(RealCPU_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+					renderer->drawString(RealCPU_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 					if (settings.showDeltas && settings.showTargetFreqs) {
-						renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
+						renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(tsl::defaultTextColor));
 					}
 					else if (settings.showDeltas && !settings.showTargetFreqs) {
-						renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(0xFFFF));
+						renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 					}
 				}
 				else if (realCPU_Hz && settings.showDeltas && (settings.showRealFreqs || settings.showTargetFreqs)) {
-					renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(0xFFFF));
+					renderer->drawString(DeltaCPU_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(tsl::defaultTextColor));
 				}
-				renderer->drawString(CPU_compressed_c, false, COMMON_MARGIN, height_offset + 30, 15, renderer->a(0xFFFF));
+				renderer->drawString(CPU_compressed_c, false, COMMON_MARGIN, height_offset + 23, 15, renderer->a(tsl::defaultTextColor));
 			}
 			
 			///GPU
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck) || R_SUCCEEDED(nvCheck)) {
 				
-				uint32_t height_offset = 320;
+				uint32_t height_offset = 327;
 				if (realGPU_Hz && settings.showRealFreqs) {
-					height_offset = 327;
+					height_offset = 337;
 				}
 
-				renderer->drawString("GPU Usage:", false, COMMON_MARGIN, 285, 20, renderer->a(0xFFFF));
+				renderer->drawString("· GPU", false, COMMON_MARGIN, 300, 20, renderer->a(tsl::statusTextColor));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 					if (settings.showTargetFreqs) { 
-						renderer->drawString(GPU_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString(GPU_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(tsl::defaultTextColor));
 
 					}
 					if (realCPU_Hz && settings.showRealFreqs) {
-						renderer->drawString(RealGPU_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+						renderer->drawString(RealGPU_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 						if (settings.showDeltas && settings.showTargetFreqs) {
-							renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
+							renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(tsl::defaultTextColor));
 						}
 						else if (settings.showDeltas && !settings.showTargetFreqs) {
-							renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(0xFFFF));
+							renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 						}
 					}
 					else if (realGPU_Hz && settings.showDeltas && (settings.showRealFreqs || settings.showTargetFreqs)) {
-						renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString(DeltaGPU_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(tsl::defaultTextColor));
 					}
 				}
 				if (R_SUCCEEDED(nvCheck)) {
-					renderer->drawString(GPU_Load_c, false, COMMON_MARGIN, height_offset + 15, 15, renderer->a(0xFFFF));
+					renderer->drawString(GPU_Load_c, false, COMMON_MARGIN, height_offset + 15, 15, renderer->a(tsl::defaultTextColor));
 				}
 				
 			}
@@ -127,70 +127,66 @@ public:
 			///RAM
 			if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck) || R_SUCCEEDED(Hinted)) {
 				
-				uint32_t height_offset = 410;
+				uint32_t height_offset = 415;
 				if (realRAM_Hz && settings.showRealFreqs) {
 					height_offset += 7;
 				}
 
-				renderer->drawString("RAM Usage:", false, COMMON_MARGIN, 375, 20, renderer->a(0xFFFF));
+				renderer->drawString("· RAM", false, COMMON_MARGIN, 385, 20, renderer->a(tsl::statusTextColor));
 				if (R_SUCCEEDED(clkrstCheck) || R_SUCCEEDED(pcvCheck)) {
 					if (settings.showTargetFreqs) {
-						renderer->drawString(RAM_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString(RAM_Hz_c, false, COMMON_MARGIN, height_offset, 15, renderer->a(tsl::defaultTextColor));
 					}
 					if (realRAM_Hz && settings.showRealFreqs) {
-						renderer->drawString(RealRAM_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(0xFFFF));
+						renderer->drawString(RealRAM_Hz_c, false, COMMON_MARGIN, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 						if (settings.showDeltas && settings.showTargetFreqs) {
-							renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(0xFFFF));
+							renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset - 7, 15, renderer->a(tsl::defaultTextColor));
 						}
 						else if (settings.showDeltas && !settings.showTargetFreqs) {
-							renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(0xFFFF));
+							renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset - 15, 15, renderer->a(tsl::defaultTextColor));
 						}
 					}
 					else if (realRAM_Hz && settings.showDeltas && (settings.showRealFreqs || settings.showTargetFreqs)) {
-						renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(0xFFFF));
+						renderer->drawString(DeltaRAM_c, false, COMMON_MARGIN + 230, height_offset, 15, renderer->a(tsl::defaultTextColor));
 					}
 					if (R_SUCCEEDED(sysclkCheck)) {
-						renderer->drawString(RAM_load_c, false, COMMON_MARGIN, height_offset+15, 15, renderer->a(0xFFFF));
+						renderer->drawString(RAM_load_c, false, COMMON_MARGIN, height_offset+15, 15, renderer->a(tsl::defaultTextColor));
 					}
 				}
 				if (R_SUCCEEDED(Hinted)) {
-					static auto dimensions = renderer->drawString("Total: \nApplication: \nApplet: \nSystem: \nSystem Unsafe: ", false, 0, height_offset + 40, 15, renderer->a(0x0000));
-					renderer->drawString("Total: \nApplication: \nApplet: \nSystem: \nSystem Unsafe: ", false, COMMON_MARGIN, height_offset + 40, 15, renderer->a(0xFFFF));
-					renderer->drawString(RAM_var_compressed_c, false, COMMON_MARGIN + dimensions.first, height_offset + 40, 15, renderer->a(0xFFFF));
+					static auto dimensions = renderer->drawString("종합 : \n타이틀 : \n애플릿 : \n시스템 : \nUnsafe : ", false, 0, height_offset + 40, 15, renderer->a(0x0000));
+					renderer->drawString("종합 : \n타이틀 : \n애플릿 : \n시스템 : \nUnsafe : ", false, COMMON_MARGIN, height_offset + 40, 15, renderer->a(tsl::defaultTextColor));
+					renderer->drawString(RAM_var_compressed_c, false, COMMON_MARGIN + dimensions.first, height_offset + 40, 15, renderer->a(tsl::defaultTextColor));
 				}
 			}
 			
 			///Thermal
 			if (R_SUCCEEDED(i2cCheck) || R_SUCCEEDED(tcCheck) || R_SUCCEEDED(pwmCheck)) {
-				renderer->drawString("Board:", false, 20, 550, 20, renderer->a(0xFFFF));
-				if (R_SUCCEEDED(i2cCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 575, 15, renderer->a(0xFFFF));
+				renderer->drawString("· 메인보드", false, 20, 555, 20, renderer->a(tsl::statusTextColor));
+				if (R_SUCCEEDED(i2cCheck)) renderer->drawString(BatteryDraw_c, false, COMMON_MARGIN, 578, 15, renderer->a(tsl::defaultTextColor));
 				if (R_SUCCEEDED(i2cCheck) || R_SUCCEEDED(tcCheck)) {
-					static auto dimensions1 = renderer->drawString("Temperatures: ", false, 0, 590, 15, renderer->a(0x0000));
-					static auto dimensions2 = renderer->drawString("SoC \nPCB \nSkin ", false, 0, 590, 15, renderer->a(0x0000));
-					renderer->drawString("Temperatures:", false, COMMON_MARGIN, 590, 15, renderer->a(0xFFFF));
-					renderer->drawString("SoC\nPCB\nSkin", false, COMMON_MARGIN + dimensions1.first, 590, 15, renderer->a(0xFFFF));
-					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 590, 15, renderer->a(0xFFFF));
+					static auto dimensions1 = renderer->drawString("온도 : ", false, 0, 593, 15, renderer->a(0x0000));
+					static auto dimensions2 = renderer->drawString("SoC \nPCB \nSkin ", false, 0, 593, 15, renderer->a(0x0000));
+					renderer->drawString("온도 :", false, COMMON_MARGIN, 593, 15, renderer->a(tsl::defaultTextColor));
+					renderer->drawString("SoC\nPCB\nSkin", false, COMMON_MARGIN + dimensions1.first, 593, 15, renderer->a(tsl::defaultTextColor));
+					renderer->drawString(SoCPCB_temperature_c, false, COMMON_MARGIN + dimensions1.first + dimensions2.first, 593, 15, renderer->a(tsl::defaultTextColor));
 				}
-				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 635, 15, renderer->a(0xFFFF));
+				if (R_SUCCEEDED(pwmCheck)) renderer->drawString(Rotation_SpeedLevel_c, false, COMMON_MARGIN, 638, 15, renderer->a(tsl::defaultTextColor));
 			}
 			
 			///FPS
-			if (GameRunning) {
-				uint32_t width_offset = 230;
-				if (settings.showFPS == true) {
-					static auto dimensions = renderer->drawString("PFPS: \nFPS:", false, COMMON_MARGIN + width_offset, 120, 20, renderer->a(0x0000));
-					renderer->drawString("PFPS: \nFPS:", false, COMMON_MARGIN + width_offset, 120, 20, renderer->a(0xFFFF));
-					uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
-					renderer->drawString(FPS_var_compressed_c, false, offset, 120, 20, renderer->a(0xFFFF));
-				}
-				if ((settings.showRES == true) && (NxFps -> API >= 1)) {
-					width_offset = 170;
-					renderer->drawString("Resolution:", false, COMMON_MARGIN + width_offset, 185, 20, renderer->a(0xFFFF));
-					renderer->drawString(Resolutions_c, false, COMMON_MARGIN + width_offset, 205, 20, renderer->a(0xFFFF));
-				}
-			}
+			uint32_t width_offset = 230;
+
+			static auto dimensions = renderer->drawString("· PFPS : \n· FPS   :", false, COMMON_MARGIN + width_offset, 110, 20, renderer->a(tsl::statusTextColor));
+			renderer->drawString("· PFPS : \n· FPS   :", false, COMMON_MARGIN + width_offset, 110, 20, renderer->a(tsl::defaultTextColor));
+			uint32_t offset = COMMON_MARGIN + width_offset + dimensions.first;
+			renderer->drawString(FPS_var_compressed_c, false, offset, 110, 20, renderer->a(tsl::defaultTextColor));
 			
-			renderer->drawString(message.c_str(), false, COMMON_MARGIN, 693, 23, renderer->a(0xFFFF));
+			width_offset = 170;
+			renderer->drawString("· 게임 해상도", false, COMMON_MARGIN, 110, 20, renderer->a(tsl::statusTextColor));
+			renderer->drawString(Resolutions_c, false, COMMON_MARGIN, 130, 15, renderer->a(tsl::defaultTextColor));
+						
+			renderer->drawString(message.c_str(), false, COMMON_MARGIN, 693, 23, renderer->a(tsl::defaultTextColor));
 			
 		});
 
@@ -202,33 +198,33 @@ public:
 	virtual void update() override {
 		//Make stuff ready to print
 		///CPU
-		snprintf(CPU_compressed_c, sizeof(CPU_compressed_c), "Core #0: %.2f%%\nCore #1: %.2f%%\nCore #2: %.2f%%\nCore #3: %.2f%%", 
+		snprintf(CPU_compressed_c, sizeof(CPU_compressed_c), "0번 코어 : %.2f%%\n1번 코어 : %.2f%%\n2번 코어 : %.2f%%\n3번 코어 : %.2f%%", 
 			(idletick0 > systemtickfrequency_impl) ? 0.0f : (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100,
 			(idletick1 > systemtickfrequency_impl) ? 0.0f : (1.d - ((double)idletick1 / systemtickfrequency_impl)) * 100,
 			(idletick2 > systemtickfrequency_impl) ? 0.0f : (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100,
 			(idletick3 > systemtickfrequency_impl) ? 0.0f : (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100);
 
 		mutexLock(&mutex_Misc);
-		snprintf(CPU_Hz_c, sizeof(CPU_Hz_c), "Target Frequency: %u.%u MHz", CPU_Hz / 1000000, (CPU_Hz / 100000) % 10);
+		snprintf(CPU_Hz_c, sizeof(CPU_Hz_c), "목표 주파수 : %u.%u MHz", CPU_Hz / 1000000, (CPU_Hz / 100000) % 10);
 		if (realCPU_Hz) {
-			snprintf(RealCPU_Hz_c, sizeof(RealCPU_Hz_c), "Real Frequency: %u.%u MHz", realCPU_Hz / 1000000, (realCPU_Hz / 100000) % 10);
+			snprintf(RealCPU_Hz_c, sizeof(RealCPU_Hz_c), "실제 주파수 : %u.%u MHz", realCPU_Hz / 1000000, (realCPU_Hz / 100000) % 10);
 			int32_t deltaCPU = (int32_t)(realCPU_Hz / 1000) - (CPU_Hz / 1000);
 			snprintf(DeltaCPU_c, sizeof(DeltaCPU_c), "Δ %d.%u", deltaCPU / 1000, abs(deltaCPU / 100) % 10);
 		}
 		
 		///GPU
-		snprintf(GPU_Hz_c, sizeof GPU_Hz_c, "Target Frequency: %u.%u MHz", GPU_Hz / 1000000, (GPU_Hz / 100000) % 10);
+		snprintf(GPU_Hz_c, sizeof GPU_Hz_c, "목표 주파수 : %u.%u MHz", GPU_Hz / 1000000, (GPU_Hz / 100000) % 10);
 		if (realGPU_Hz) {
-			snprintf(RealGPU_Hz_c, sizeof(RealGPU_Hz_c), "Real Frequency: %u.%u MHz", realGPU_Hz / 1000000, (realGPU_Hz / 100000) % 10);
+			snprintf(RealGPU_Hz_c, sizeof(RealGPU_Hz_c), "실제 주파수 : %u.%u MHz", realGPU_Hz / 1000000, (realGPU_Hz / 100000) % 10);
 			int32_t deltaGPU = (int32_t)(realGPU_Hz / 1000) - (GPU_Hz / 1000);
 			snprintf(DeltaGPU_c, sizeof(DeltaGPU_c), "Δ %d.%u", deltaGPU / 1000, abs(deltaGPU / 100) % 10);
 		}
-		snprintf(GPU_Load_c, sizeof GPU_Load_c, "Load: %u.%u%%", GPU_Load_u / 10, GPU_Load_u % 10);
+		snprintf(GPU_Load_c, sizeof GPU_Load_c, "로드율 : %u.%u%%", GPU_Load_u / 10, GPU_Load_u % 10);
 		
 		///RAM
-		snprintf(RAM_Hz_c, sizeof RAM_Hz_c, "Target Frequency: %u.%u MHz", RAM_Hz / 1000000, (RAM_Hz / 100000) % 10);
+		snprintf(RAM_Hz_c, sizeof RAM_Hz_c, "목표 주파수 : %u.%u MHz", RAM_Hz / 1000000, (RAM_Hz / 100000) % 10);
 		if (realRAM_Hz) {
-			snprintf(RealRAM_Hz_c, sizeof(RealRAM_Hz_c), "Real Frequency: %u.%u MHz", realRAM_Hz / 1000000, (realRAM_Hz / 100000) % 10);
+			snprintf(RealRAM_Hz_c, sizeof(RealRAM_Hz_c), "실제 주파수 : %u.%u MHz", realRAM_Hz / 1000000, (realRAM_Hz / 100000) % 10);
 			int32_t deltaRAM = (int32_t)(realRAM_Hz / 1000) - (RAM_Hz / 1000);
 			snprintf(DeltaRAM_c, sizeof(DeltaRAM_c), "Δ %d.%u", deltaRAM / 1000, abs(deltaRAM / 100) % 10);
 		}
@@ -253,7 +249,7 @@ public:
 		if (R_SUCCEEDED(sysclkCheck)) {
 			int RAM_GPU_Load = ramLoad[SysClkRamLoad_All] - ramLoad[SysClkRamLoad_Cpu];
 			snprintf(RAM_load_c, sizeof RAM_load_c, 
-				"Load: %u.%u%% (CPU %u.%u | GPU %u.%u)",
+				"로드율 : %u.%u%% (CPU %u.%u | GPU %u.%u)",
 				ramLoad[SysClkRamLoad_All] / 10, ramLoad[SysClkRamLoad_All] % 10,
 				ramLoad[SysClkRamLoad_Cpu] / 10, ramLoad[SysClkRamLoad_Cpu] % 10,
 				RAM_GPU_Load / 10, RAM_GPU_Load % 10);
@@ -262,7 +258,7 @@ public:
 		snprintf(SoCPCB_temperature_c, sizeof SoCPCB_temperature_c, 
 			"%2.1f\u00B0C\n%2.1f\u00B0C\n%2d.%d\u00B0C", 
 			SOC_temperatureF, PCB_temperatureF, skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
-		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "Fan Rotation Level: %2.1f%%", Rotation_Duty);
+		snprintf(Rotation_SpeedLevel_c, sizeof Rotation_SpeedLevel_c, "팬 커브 : %2.1f%%", Rotation_Duty);
 		
 		///FPS
 		if (settings.showFPS == true) 
@@ -349,7 +345,7 @@ public:
 			snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "%d:%02d", batTimeEstimate / 60, batTimeEstimate % 60);
 		}
 		else snprintf(remainingBatteryLife, sizeof remainingBatteryLife, "-:--");
-		snprintf(BatteryDraw_c, sizeof BatteryDraw_c, "Battery Power Flow: %+.2fW[%s]", PowerConsumption, remainingBatteryLife);
+		snprintf(BatteryDraw_c, sizeof BatteryDraw_c, "소비전력 : %+.2fW [%s]", PowerConsumption, remainingBatteryLife);
 		mutexUnlock(&mutex_BatteryChecker);
 		
 	}

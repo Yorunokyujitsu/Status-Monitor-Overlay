@@ -4,6 +4,12 @@ private:
 	uint8_t refreshRate = 0;
 	char FPSavg_c[8];
 	FpsGraphSettings settings;
+	uint64_t systemtickfrequency_impl = systemtickfrequency;
+	uint32_t cnt = 0;
+	char CPU_Load_c[12] = "";
+	char GPU_Load_c[12] = "";
+	char RAM_Load_c[12] = "";
+	char TEMP_c[32] = "";
 public:
 	bool isStarted = false;
     com_FPSGraph() { 
@@ -31,7 +37,10 @@ public:
 		tsl::hlp::requestForeground(false);
 		FullMode = false;
 		TeslaFPS = settings.refreshRate;
+		systemtickfrequency_impl /= settings.refreshRate;
 		deactivateOriginalFooter = true;
+		mutexInit(&mutex_Misc);
+		StartInfoThread();
 	}
 
 	~com_FPSGraph() {
@@ -42,6 +51,7 @@ public:
 		tsl::hlp::requestForeground(true);
 		alphabackground = 0xD;
 		deactivateOriginalFooter = false;
+		EndInfoThread();
 	}
 
 	struct stats {
@@ -107,17 +117,38 @@ public:
 					break;
 			}
 
-			renderer->drawRect(base_x, base_y, rectangle_width + 21, rectangle_height + 12, a(settings.backgroundColor));
+		    // Horizontal alignment (base_x)
+		    if (ult::useRightAlignment) {
+		        base_x = 362 - (rectangle_width + 21);  // Align to the right
+		    } else {
+		        // Default horizontal alignment based on settings.setPos
+		        switch (settings.setPos) {
+		            case 1:
+		            case 4:
+		            case 7:
+		                base_x = 224 - ((rectangle_width + 21) / 2);  // Centered horizontally
+		                break;
+		            case 2:
+		            case 5:
+		            case 8:
+		                base_x = 448 - (rectangle_width + 21);  // Align to the right
+		                break;
+		        }
+		    }
+
+			renderer->drawRect(base_x, base_y, rectangle_width + 21, rectangle_height + 12, renderer->a(tsl::defaultBackgroundColor));
 			s16 size = (refreshRate > 60 || !refreshRate) ? 63 : (s32)(63.0/(60.0/refreshRate));
-			std::pair<u32, u32> dimensions = renderer->drawString(FPSavg_c, false, 0, 0, size, renderer->a(0x0000));
+			//std::pair<u32, u32> dimensions = renderer->drawString(FPSavg_c, false, 0, 0, size, renderer->a(0x0000));
+			auto width = tsl::gfx::calculateStringWidth(FPSavg_c, size);
+
 			s16 pos_y = size + base_y + rectangle_y + ((rectangle_height - size) / 2);
-			s16 pos_x = base_x + rectangle_x + ((rectangle_width - dimensions.first) / 2);
+			s16 pos_x = base_x + rectangle_x + ((rectangle_width - width) / 2);
 
 			renderer->drawString(FPSavg_c, false, pos_x, pos_y, size, renderer->a(settings.fpsColor));
 			renderer->drawEmptyRect(base_x+(rectangle_x - 1), base_y+(rectangle_y - 1), rectangle_width + 2, rectangle_height + 4, renderer->a(settings.borderColor));
 			renderer->drawDashedLine(base_x+rectangle_x, base_y+y_30FPS, base_x+rectangle_x+rectangle_width, base_y+y_30FPS, 6, renderer->a(settings.dashedLineColor));
-			renderer->drawString(&legend_max[0], false, base_x+(rectangle_x-15), base_y+(rectangle_y+7), 10, renderer->a(settings.maxFPSTextColor));
-			renderer->drawString(&legend_min[0], false, base_x+(rectangle_x-10), base_y+(rectangle_y+rectangle_height+3), 10, renderer->a(settings.minFPSTextColor));
+			renderer->drawString(&legend_max[0], false, base_x+(rectangle_x-15), base_y+(rectangle_y+7), 10, renderer->a(tsl::defaultTextColor));
+			renderer->drawString(&legend_min[0], false, base_x+(rectangle_x-10), base_y+(rectangle_y+rectangle_height+3), 10, renderer->a(tsl::defaultTextColor));
 
 			size_t last_element = readings.size() - 1;
 
@@ -132,7 +163,7 @@ public:
 				}
 				
 				s16 y = rectangle_y + static_cast<s16>(std::lround((float)rectangle_height * ((float)(range - y_on_range) / (float)range))); // 320 + (80 * ((61 - 61)/61)) = 320
-				auto colour = renderer->a(settings.mainLineColor);
+				auto colour = renderer->a(tsl::defaultTextColor);
 				if (y == y_old && !isAbove && readings[last_element].zero_rounded) {
 					if ((y == y_30FPS || y == y_60FPS))
 						colour = renderer->a(settings.perfectLineColor);
@@ -160,6 +191,17 @@ public:
 				last_element--;
 			}
 
+			if (settings.showInfo) {
+				s16 info_x = base_x+rectangle_width+rectangle_x + 6;
+				s16 info_y = base_y + 3;
+				renderer->drawRect(info_x, 0, rectangle_width /2 - 4, rectangle_height + 12, renderer->a(tsl::defaultBackgroundColor));
+				renderer->drawString("CPU\nGPU\nRAM\nSOC\nPCB\nSKN", false, info_x, info_y+11, 11, renderer->a(settings.borderColor));
+
+				renderer->drawString(CPU_Load_c, false, info_x + 40, info_y+11, 11, renderer->a(tsl::defaultTextColor));
+				renderer->drawString(GPU_Load_c, false, info_x + 40, info_y+22, 11, renderer->a(tsl::defaultTextColor));
+				renderer->drawString(RAM_Load_c, false, info_x + 40, info_y+33, 11, renderer->a(tsl::defaultTextColor));
+				renderer->drawString(TEMP_c, false, info_x + 40, info_y+44, 11, renderer->a(tsl::defaultTextColor));
+			}
 		});
 
 		rootFrame->setContent(Status);
@@ -168,6 +210,10 @@ public:
 	}
 
 	virtual void update() override {
+		cnt++;
+		if (cnt >= TeslaFPS)
+			cnt = 0;
+
 		///FPS
 		stats temp = {0, false};
 		static float last = 0;
@@ -194,7 +240,34 @@ public:
 			readings.shrink_to_fit();
 			last = 0;
 		}
+
+		if (cnt)
+			return;
+
+		mutexLock(&mutex_Misc);
+
+		snprintf(TEMP_c, sizeof TEMP_c, 
+			"%2.1f\u00B0C\n%2.1f\u00B0C\n%2d.%d\u00B0C", 
+			SOC_temperatureF, PCB_temperatureF, skin_temperaturemiliC / 1000, (skin_temperaturemiliC / 100) % 10);
+
+		if (idletick0 > systemtickfrequency_impl) idletick0 = systemtickfrequency_impl;
+		if (idletick1 > systemtickfrequency_impl) idletick1 = systemtickfrequency_impl;
+		if (idletick2 > systemtickfrequency_impl) idletick2 = systemtickfrequency_impl;
+		if (idletick3 > systemtickfrequency_impl) idletick3 = systemtickfrequency_impl;
+		double cpu_usage0 = (1.d - ((double)idletick0 / systemtickfrequency_impl)) * 100;
+		double cpu_usage1 = (1.d - ((double)idletick1 / systemtickfrequency_impl)) * 100;
+		double cpu_usage2 = (1.d - ((double)idletick2 / systemtickfrequency_impl)) * 100;
+		double cpu_usage3 = (1.d - ((double)idletick3 / systemtickfrequency_impl)) * 100;
+		double cpu_usageM = 0;
+		if (cpu_usage0 > cpu_usageM)	cpu_usageM = cpu_usage0;
+		if (cpu_usage1 > cpu_usageM)	cpu_usageM = cpu_usage1;
+		if (cpu_usage2 > cpu_usageM)	cpu_usageM = cpu_usage2;
+		if (cpu_usage3 > cpu_usageM)	cpu_usageM = cpu_usage3;
+		snprintf(CPU_Load_c, sizeof CPU_Load_c, "%.1f%%", cpu_usageM);
+		snprintf(GPU_Load_c, sizeof GPU_Load_c, "%d.%d%%", GPU_Load_u / 10, GPU_Load_u % 10);
+		snprintf(RAM_Load_c, sizeof RAM_Load_c, "%hu.%hhu%%", ramLoad[SysClkRamLoad_All] / 10, ramLoad[SysClkRamLoad_All] % 10);
 		
+		mutexUnlock(&mutex_Misc);
 	}
 	virtual bool handleInput(uint64_t keysDown, uint64_t keysHeld, touchPosition touchInput, JoystickPosition leftJoyStick, JoystickPosition rightJoyStick) override {
 		if (isKeyComboPressed(keysHeld, keysDown, mappedButtons)) {

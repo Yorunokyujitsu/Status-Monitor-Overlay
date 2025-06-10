@@ -48,6 +48,8 @@ public:
 		auto Status = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, u16 x, u16 y, u16 w, u16 h) {
 			int base_y = 0;
 			int base_x = 0;
+			const int frameWidth = 448;
+		
 			switch(settings.setPos) {
 				case 1:
 					base_x = 48;
@@ -79,13 +81,18 @@ public:
 					break;	
 			}
 
-			if (gameStart && NxFps -> API >= 1) {
-				renderer->drawRect(base_x, base_y, 360, 200, a(settings.backgroundColor));
+			// Adjust for right-side alignment
+			if (ult::useRightAlignment) {
+				base_x = frameWidth - base_x - 360; // Subtract width of the box (360px) from the frame width
+			}
 
-				renderer->drawString("Depth:", false, base_x+20, base_y+20, 20, renderer->a(settings.catColor));
-				renderer->drawString(Resolutions_c, false, base_x+20, base_y+55, 18, renderer->a(settings.textColor));
-				renderer->drawString("Viewport:", false, base_x+180, base_y+20, 20, renderer->a(settings.catColor));
-				renderer->drawString(Resolutions2_c, false, base_x+180, base_y+55, 18, renderer->a(settings.textColor));
+			if (gameStart && NxFps -> API == 1) {
+				renderer->drawRect(base_x, base_y, 360, 200, renderer->a(tsl::defaultBackgroundColor));
+
+				renderer->drawString("심도 [Depth]:", false, base_x+20, base_y+20, 20, renderer->a(tsl::statusTextColor));
+				renderer->drawString(Resolutions_c, false, base_x+20, base_y+55, 18, renderer->a(tsl::defaultTextColor));
+				renderer->drawString("노출 [Viewport]:", false, base_x+180, base_y+20, 20, renderer->a(tsl::statusTextColor));
+				renderer->drawString(Resolutions2_c, false, base_x+180, base_y+55, 18, renderer->a(tsl::defaultTextColor));
 			}
 			else {
 				switch(settings.setPos) {
@@ -96,8 +103,8 @@ public:
 						base_y = 692;
 						break;
 				}
-				renderer->drawRect(base_x, base_y, 360, 28, a(settings.backgroundColor));
-				renderer->drawString("Game is not running or it's incompatible.", false, base_x, base_y+20, 18, renderer->a(0xF00F));
+				renderer->drawRect(base_x, base_y, 360, 28, renderer->a(tsl::defaultBackgroundColor));
+				renderer->drawString("  - 실행중이거나 호환되는 게임이 없습니다.", false, base_x, base_y+20, 18, renderer->a(tsl::warningTextColor));
 			}
 		});
 

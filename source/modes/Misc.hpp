@@ -48,45 +48,44 @@ public:
 	}
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", APP_VERSION);
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", APP_VERSION"-ASAP");
 
 		auto Status = new tsl::elm::CustomDrawer([this](tsl::gfx::Renderer *renderer, u16 x, u16 y, u16 w, u16 h) {
 			
 			///DSP
 			if (R_SUCCEEDED(audsnoopCheck)) {
-				renderer->drawString(DSP_Load_c, false, 20, 120, 20, renderer->a(0xFFFF));
+				renderer->drawString(DSP_Load_c, false, 20, 120, 20, renderer->a(tsl::defaultTextColor));
 			}
 
 			//Multimedia engines
 			if (R_SUCCEEDED(nvdecCheck | nvencCheck | nvjpgCheck)) {
-				renderer->drawString("Multimedia clock rates:", false, 20, 165, 20, renderer->a(0xFFFF));
+				renderer->drawString("멀티미디어 클럭 속도", false, 20, 165, 20, renderer->a(tsl::statusTextColor));
 				if (R_SUCCEEDED(nvdecCheck))
-					renderer->drawString(NVDEC_Hz_c, false, 35, 185, 15, renderer->a(0xFFFF));
+					renderer->drawString(NVDEC_Hz_c, false, 35, 185, 15, renderer->a(tsl::defaultTextColor));
 				if (R_SUCCEEDED(nvencCheck))
-					renderer->drawString(NVENC_Hz_c, false, 35, 200, 15, renderer->a(0xFFFF));
+					renderer->drawString(NVENC_Hz_c, false, 35, 200, 15, renderer->a(tsl::defaultTextColor));
 				if (R_SUCCEEDED(nvjpgCheck))
-					renderer->drawString(NVJPG_Hz_c, false, 35, 215, 15, renderer->a(0xFFFF));
+					renderer->drawString(NVJPG_Hz_c, false, 35, 215, 15, renderer->a(tsl::defaultTextColor));
 			}
 
 			if (R_SUCCEEDED(nifmCheck)) {
-				renderer->drawString("Network", false, 20, 255, 20, renderer->a(0xFFFF));
+				renderer->drawString("네트워크", false, 20, 255, 20, renderer->a(tsl::statusTextColor));
 				if (!Nifm_internet_rc) {
 					if (NifmConnectionType == NifmInternetConnectionType_WiFi) {
-						renderer->drawString("Type: Wi-Fi", false, 20, 280, 18, renderer->a(0xFFFF));
+						renderer->drawString("타입 : Wi-Fi", false, 35, 280, 18, renderer->a(tsl::defaultTextColor));
 						if (!Nifm_profile_rc) {
 							if (Nifm_showpass)
-								renderer->drawString(Nifm_pass, false, 20, 305, 15, renderer->a(0xFFFF));
+								renderer->drawString(Nifm_pass, false, 35, 305, 15, renderer->a(tsl::defaultTextColor));
 							else
-								renderer->drawString("Press Y to show password", false, 20, 305, 15, renderer->a(0xFFFF));
+								renderer->drawString("\uE0E3 패스워드 확인", false, 35, 305, 15, renderer->a(tsl::defaultTextColor));
 						}
 					}
 					else if (NifmConnectionType == NifmInternetConnectionType_Ethernet)
-						renderer->drawString("Type: Ethernet", false, 20, 280, 18, renderer->a(0xFFFF));
+						renderer->drawString("타입 : 이더넷", false, 35, 280, 18, renderer->a(tsl::defaultTextColor));
 				}
 				else
-					renderer->drawString("Type: Not connected", false, 20, 280, 18, renderer->a(0xFFFF));
+					renderer->drawString("타입 : 연결 없음", false, 35, 280, 18, renderer->a(tsl::defaultTextColor));
 			}
-
 
 		});
 
@@ -97,10 +96,10 @@ public:
 
 	virtual void update() override {
 
-		snprintf(DSP_Load_c, sizeof DSP_Load_c, "DSP usage: %u%%", DSP_Load_u);
-		snprintf(NVDEC_Hz_c, sizeof NVDEC_Hz_c, "NVDEC: %.1f MHz", (float)NVDEC_Hz / 1000000);
-		snprintf(NVENC_Hz_c, sizeof NVENC_Hz_c, "NVENC: %.1f MHz", (float)NVENC_Hz / 1000000);
-		snprintf(NVJPG_Hz_c, sizeof NVJPG_Hz_c, "NVJPG: %.1f MHz", (float)NVJPG_Hz / 1000000);
+		snprintf(DSP_Load_c, sizeof DSP_Load_c, "DSP   : %u%%", DSP_Load_u);
+		snprintf(NVDEC_Hz_c, sizeof NVDEC_Hz_c, "NVDEC : %.1f MHz", (float)NVDEC_Hz / 1000000);
+		snprintf(NVENC_Hz_c, sizeof NVENC_Hz_c, "NVENC : %.1f MHz", (float)NVENC_Hz / 1000000);
+		snprintf(NVJPG_Hz_c, sizeof NVJPG_Hz_c, "NVJPG  : %.1f MHz", (float)NVJPG_Hz / 1000000);
 		char pass_temp1[25] = "";
 		char pass_temp2[25] = "";
 		char pass_temp3[17] = "";

@@ -21,10 +21,10 @@ public:
     GraphsMenu() {}
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", "FPS");
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", "FPS");
 		auto list = new tsl::elm::List();
 
-		auto comFPSGraph = new tsl::elm::ListItem("Graph");
+		auto comFPSGraph = new tsl::elm::ListItem("그래프");
 		comFPSGraph->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<com_FPSGraph>();
@@ -34,7 +34,7 @@ public:
 		});
 		list->addItem(comFPSGraph);
 
-		auto comFPSCounter = new tsl::elm::ListItem("Counter");
+		auto comFPSCounter = new tsl::elm::ListItem("카운터");
 		comFPSCounter->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<com_FPS>();
@@ -66,10 +66,10 @@ public:
     OtherMenu() { }
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", "Other");
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", "기타");
 		auto list = new tsl::elm::List();
 
-		auto Battery = new tsl::elm::ListItem("Battery/Charger");
+		auto Battery = new tsl::elm::ListItem("배터리/충전");
 		Battery->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<BatteryOverlay>();
@@ -79,7 +79,7 @@ public:
 		});
 		list->addItem(Battery);
 
-		auto Misc = new tsl::elm::ListItem("Miscellaneous");
+		auto Misc = new tsl::elm::ListItem("기타");
 		Misc->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<MiscOverlay>();
@@ -90,7 +90,7 @@ public:
 		list->addItem(Misc);
 
 		if (SaltySD) {
-			auto Res = new tsl::elm::ListItem("Game Resolutions");
+			auto Res = new tsl::elm::ListItem("게임 해상도");
 			Res->setClickListener([](uint64_t keys) {
 				if (keys & KEY_A) {
 					tsl::changeTo<ResolutionsOverlay>();
@@ -123,10 +123,10 @@ public:
     MainMenu() {}
 
     virtual tsl::elm::Element* createUI() override {
-		rootFrame = new tsl::elm::OverlayFrame("Status Monitor", APP_VERSION);
+		rootFrame = new tsl::elm::OverlayFrame("상태 모니터", APP_VERSION"-ASAP");
 		auto list = new tsl::elm::List();
 		
-		auto Full = new tsl::elm::ListItem("Full");
+		auto Full = new tsl::elm::ListItem("전체");
 		Full->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<FullOverlay>();
@@ -135,7 +135,7 @@ public:
 			return false;
 		});
 		list->addItem(Full);
-		auto Mini = new tsl::elm::ListItem("Mini");
+		auto Mini = new tsl::elm::ListItem("팝업창");
 		Mini->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<MiniOverlay>();
@@ -161,7 +161,7 @@ public:
 			}
 		}
 		if (fileExist) {
-			auto Micro = new tsl::elm::ListItem("Micro");
+			auto Micro = new tsl::elm::ListItem("상단바");
 			Micro->setClickListener([](uint64_t keys) {
 				if (keys & KEY_A) {
 					tsl::setNextOverlay(filepath, "--microOverlay_");
@@ -183,7 +183,7 @@ public:
 			});
 			list->addItem(Graphs);
 		}
-		auto Other = new tsl::elm::ListItem("Other");
+		auto Other = new tsl::elm::ListItem("기타");
 		Other->setClickListener([](uint64_t keys) {
 			if (keys & KEY_A) {
 				tsl::changeTo<OtherMenu>();
@@ -251,6 +251,18 @@ public:
 				}
 				else sysclkCheck = 0;
 			}
+			u64 sku = 0;
+		    if (R_SUCCEEDED(splInitialize())) {
+				splGetConfig(SplConfigItem_HardwareType, &sku);
+				switch(sku) {
+					case 2 ... 5:
+						isMariko = true;
+						break;
+					default:
+						isMariko = false;
+				}
+			}
+			splExit();
 		});
 		Hinted = envIsSyscallHinted(0x6F);
 	}
@@ -321,6 +333,18 @@ public:
 				}
 				else sysclkCheck = 0;
 			}
+			u64 sku = 0;
+			if (R_SUCCEEDED(splInitialize())) {
+				splGetConfig(SplConfigItem_HardwareType, &sku);
+				switch(sku) {
+					case 2 ... 5:
+						isMariko = true;
+						break;
+					default:
+						isMariko = false;
+				}
+			}
+			splExit();
 		});
 		Hinted = envIsSyscallHinted(0x6F);
 	}
@@ -364,8 +388,8 @@ int main(int argc, char **argv) {
 	}
 	for (u8 arg = 0; arg < argc; arg++) {
 		if (strcasecmp(argv[arg], "--microOverlay_") == 0) {
-			framebufferWidth = 1280;
-			framebufferHeight = 28;
+			ult::DefaultFramebufferWidth = 1280;
+			ult::DefaultFramebufferHeight = 18;
 			FILE* test = fopen(std::string(folderpath + filename).c_str(), "rb");
 			if (test) {
 				fclose(test);
@@ -381,8 +405,8 @@ int main(int argc, char **argv) {
 			return tsl::loop<MicroMode>(argc, argv);
 		} else if (strcasecmp(argv[arg], "--microOverlay") == 0) {
             skipMain = true;
-			framebufferWidth = 1280;
-			framebufferHeight = 28;
+			ult::DefaultFramebufferWidth = 1280;
+			ult::DefaultFramebufferHeight = 18;
 			FILE* test = fopen(std::string(folderpath + filename).c_str(), "rb");
 			if (test) {
 				fclose(test);
